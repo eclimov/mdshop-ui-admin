@@ -46,6 +46,7 @@ workflows:
     jobs:
       - build
       - deploy:
+          context: mdshop # The context shares common environment variables
           requires:
             - build
           filters:
