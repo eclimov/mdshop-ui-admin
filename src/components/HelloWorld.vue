@@ -1,5 +1,7 @@
 <template>
   <div class="hello">
+    QWERTY {{ banks }}
+    ASDFG {{ theBank }}
     <h1>{{ msg }}</h1>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
@@ -31,10 +33,24 @@
 </template>
 
 <script>
+import { findBank, getBanks } from "@/api/banks"
+
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+
+  data () {
+    return {
+      banks: [],
+      theBank: null
+    }
+  },
+
+  async mounted () {
+    this.banks = await getBanks()
+    this.theBank = await findBank(1)
   }
 }
 </script>
