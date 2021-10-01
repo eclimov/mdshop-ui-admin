@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { findBank, getBanks } from "@/api/banks"
+import { findBank, getBanks } from '@/api/banks'
 
 export default {
   name: 'HelloWorld',

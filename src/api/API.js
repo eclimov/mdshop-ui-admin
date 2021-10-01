@@ -1,8 +1,10 @@
 import axios from 'axios'
 
+const apiUrl = process.env.VUE_APP_API_URL || ''
+
 export default axios.create({
-  baseURL: '/api',
+  baseURL: `${apiUrl}/api`,
   headers: {
-    'Accept': 'application/json'
+    Accept: 'application/json'
   }
 })
