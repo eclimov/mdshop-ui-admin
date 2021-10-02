@@ -25,12 +25,6 @@
     </div>
 
     <div class="header-item text-centered">
-      <router-link :to="{ name: 'users' }">
-        Users
-      </router-link>
-    </div>
-
-    <div class="header-item text-centered">
       <router-link :to="{ name: 'login' }">
         Login
       </router-link>

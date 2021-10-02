@@ -6,4 +6,3 @@ https://stackoverflow.com/questions/51588009/vue-js-configuring-webstorm-to-set-
 ## Project properties
 ### Design
 [Color palette](https://www.color-hex.com/color-palette/78470)  
-[NaiveUI](https://www.naiveui.com/en-US/dark)  

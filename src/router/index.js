@@ -3,7 +3,6 @@ import Invoices from '@/views/Invoices'
 import { createRouter, createWebHistory } from 'vue-router'
 import Companies from '@/views/Companies'
 import Banks from '@/views/Banks'
-import Users from '@/views/Users'
 import Login from '@/views/Login'
 
 const routes = [
@@ -26,11 +25,6 @@ const routes = [
     path: '/banks',
     name: 'banks',
     component: Banks
-  },
-  {
-    path: '/users',
-    name: 'users',
-    component: Users
   },
   {
     path: '/login',
