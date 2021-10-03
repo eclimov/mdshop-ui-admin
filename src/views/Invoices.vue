@@ -11,6 +11,7 @@
     </v-card-title>
 
     <v-data-table
+      dense
       :headers="headers"
       :items="items"
       class="elevation-1"
