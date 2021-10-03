@@ -50,7 +50,7 @@ a, a:visited, a:hover, a:active {
   color: inherit;
 }
 
-.router-link-active {
+.router-link-exact-active {
   color: #c38d9e !important;
 }
 

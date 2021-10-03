@@ -1,9 +1,15 @@
 module.exports = {
+  root: true,
+  env: {
+    node: true
+  },
+  parser: 'vue-eslint-parser',
   extends: [
     'standard',
-    'plugin:vue/vue3-recommended',
-    'plugin:vue-scoped-css/vue3-recommended'
+    'eslint:recommended',
+    '@vue/standard',
+    'plugin:vue/recommended',
+    'plugin:vue-scoped-css/recommended'
   ],
-  rules: {
-  }
+  rules: {}
 }

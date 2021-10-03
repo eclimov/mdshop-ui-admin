@@ -1,6 +1,6 @@
 import Home from '@/views/Home'
 import Invoices from '@/views/Invoices'
-import { createRouter, createWebHistory } from 'vue-router'
+import VueRouter from 'vue-router'
 import Companies from '@/views/Companies'
 import Banks from '@/views/Banks'
 import Login from '@/views/Login'
@@ -33,10 +33,10 @@ const routes = [
   }
 ]
 
-const router = createRouter({
-  // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
-  history: createWebHistory(),
-  routes // short for `routes: routes`
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
 })
 
 export default router
