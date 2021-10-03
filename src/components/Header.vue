@@ -1,35 +1,53 @@
 <template>
-  <div id="header">
-    <div class="logo header-item text-centered">
+  <v-app-bar
+    app
+    color="secondary"
+    dark
+  >
+    <div class="d-flex align-center">
       <router-link :to="{ name: 'home' }">
-        Artprezent
+        <v-img
+          alt="Logo"
+          class="shrink mr-2"
+          contain
+          src="@/assets/logo.png"
+          transition="scale-transition"
+          width="40"
+        />
       </router-link>
     </div>
 
-    <div class="header-item text-centered">
-      <router-link :to="{ name: 'invoices' }">
-        Invoices
-      </router-link>
-    </div>
+    <v-btn
+      text
+      :to="{ name: 'invoices' }"
+    >
+      Invoices
+    </v-btn>
 
-    <div class="header-item text-centered">
-      <router-link :to="{ name: 'companies' }">
-        Companies
-      </router-link>
-    </div>
+    <v-btn
+      text
+      :to="{ name: 'companies' }"
+    >
+      Companies
+    </v-btn>
 
-    <div class="header-item text-centered">
-      <router-link :to="{ name: 'banks' }">
-        Banks
-      </router-link>
-    </div>
+    <v-btn
+      text
+      :to="{ name: 'banks' }"
+    >
+      Banks
+    </v-btn>
 
-    <div class="header-item text-centered">
-      <router-link :to="{ name: 'login' }">
-        Login
-      </router-link>
-    </div>
-  </div>
+    <v-spacer />
+
+    <v-btn
+      icon
+      title="Login"
+      :to="{ name: 'login' }"
+    >
+      <v-icon>mdi-login</v-icon>
+    </v-btn>
+  </v-app-bar>
 </template>
 
 <script>
@@ -39,25 +57,5 @@ export default {
 </script>
 
 <style scoped>
-.header-item {
-  margin: 15px;
-}
 
-#header {
-  grid-column: 1 / -1;
-  background-color: #343a40;
-  color: white;
-  display: flex;
-}
-
-#header > div:last-child {
-  margin-left: auto;
-}
-
-.logo {
-  font-weight: bold;
-  font-size: 19px;
-  font-style: italic;
-  color: #e17d60;
-}
 </style>

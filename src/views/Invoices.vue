@@ -1,40 +1,55 @@
 <template>
-  <div>
-    <Loader v-if="isLoading" />
-    <table v-else>
-      <tr>
-        <th>ID</th>
-        <th>Seller</th>
-        <th>Buyer</th>
-        <th>Created At</th>
-      </tr>
-      <tr
-        v-for="item in items"
-        :key="item.id"
-      >
-        <td>{{ item.id }}</td>
-        <td>{{ item.seller.name }}</td>
-        <td>{{ item.buyer.name }}</td>
-        <td>{{ item.created_at }}</td>
-      </tr>
-    </table>
-  </div>
+  <v-card>
+    <v-card-title>
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      />
+    </v-card-title>
+
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      class="elevation-1"
+      :loading="isLoading"
+      loading-text="Loading... Please wait"
+      :search="search"
+      hide-default-footer
+    >
+      <template v-slot:item.created_at="{ item }">
+        {{ $options.dateFormat(item.created_at) }}
+      </template>
+    </v-data-table>
+  </v-card>
 </template>
 
 <script>
 
-import Loader from '@/components/Loader'
 import { getInvoices } from '@/api/invoices'
+import { dateFormat } from '@/utils/string'
 
 export default {
   name: 'Invoices',
-  components: {
-    Loader
-  },
+  dateFormat,
+  components: {},
 
   data () {
     return {
       isLoading: false,
+      search: '',
+      headers: [
+        {
+          text: 'ID',
+          align: 'start',
+          value: 'id'
+        },
+        { text: 'Seller', value: 'seller.name' },
+        { text: 'Buyer', value: 'buyer.name' },
+        { text: 'Created At', sortable: false, value: 'created_at' }
+      ],
       items: []
     }
   },
