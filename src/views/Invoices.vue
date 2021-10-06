@@ -12,6 +12,7 @@
 
     <v-data-table
       dense
+      :items-per-page="items.length"
       :headers="headers"
       :items="items"
       class="elevation-1"
