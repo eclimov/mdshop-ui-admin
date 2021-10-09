@@ -6,6 +6,8 @@
       @confirm="deleteItemConfirm(editedId)"
     />
 
+    <v-card-title>Bank Affiliates</v-card-title>
+
     <v-card-title>
       <v-dialog
         v-model="dialog"
@@ -38,9 +40,9 @@
                   cols="12"
                 >
                   <v-text-field
-                    v-model="editedItem.name"
+                    v-model="editedItem.affiliateNumber"
                     autofocus
-                    label="Name"
+                    label="Affiliate Number"
                   />
                 </v-col>
               </v-row>
@@ -87,12 +89,6 @@
       :search="search"
       hide-default-footer
     >
-      <template v-slot:item.name="{ item }">
-        <router-link :to="{ name: 'bank', params: { id: item.id } }">
-          {{ item.name }}
-        </router-link>
-      </template>
-
       <template v-slot:item.created_at="{ item }">
         {{ $options.dateFormat(item.created_at) }}
       </template>
@@ -119,15 +115,21 @@
 </template>
 
 <script>
-
-import { createBank, deleteBank, getBanks, updateBank } from '@/api/banks'
-import { dateFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
+import { API_PATH_BANKS } from '@/api/banks'
+import { createBankAffiliate, deleteBankAffiliate, getBankAffiliatesByBankId, updateBankAffiliate } from '@/api/bankAffiliates'
+import { dateFormat } from '@/utils/string'
 
 export default {
-  name: 'Banks',
-  dateFormat,
+  name: 'BankAffiliates',
   components: { ModalConfirm },
+  dateFormat,
+  props: {
+    bank: {
+      type: Object,
+      required: true
+    }
+  },
 
   data () {
     return {
@@ -142,16 +144,18 @@ export default {
           align: 'start',
           value: 'id'
         },
-        { text: 'Name', value: 'name' },
+        { text: 'Affiliate Number', value: 'affiliateNumber' },
         { text: 'Created At', sortable: false, value: 'created_at' },
         { text: 'Actions', value: 'actions', sortable: false }
       ],
       items: [],
       editedItem: {
-        name: ''
+        affiliateNumber: '',
+        bank: `${API_PATH_BANKS}/${this.bank.id}`
       },
       defaultItem: {
-        name: ''
+        affiliateNumber: '',
+        bank: `${API_PATH_BANKS}/${this.bank.id}`
       }
     }
   },
@@ -176,7 +180,7 @@ export default {
     async fetch () {
       this.isLoading = true
       try {
-        this.items = (await getBanks()).data
+        this.items = (await getBankAffiliatesByBankId(this.bank.id)).data
       } finally {
         this.isLoading = false
       }
@@ -191,9 +195,9 @@ export default {
       try {
         this.isLoading = true
         if (editedId) {
-          await updateBank(editedId, editedItem)
+          await updateBankAffiliate(editedId, editedItem)
         } else {
-          await createBank(editedItem)
+          await createBankAffiliate(editedItem)
         }
       } finally {
         await this.fetch()
@@ -216,7 +220,7 @@ export default {
       this.resetEditedId()
       this.isLoading = true
       try {
-        await deleteBank(id)
+        await deleteBankAffiliate(id)
       } finally {
         await this.fetch()
         this.isLoading = false
@@ -236,3 +240,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+</style>

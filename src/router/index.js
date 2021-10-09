@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 import Companies from '@/views/Companies'
 import Banks from '@/views/Banks'
 import Login from '@/views/Login'
+import Bank from '@/views/Bank'
 
 const routes = [
   {
@@ -25,6 +26,12 @@ const routes = [
     path: '/banks',
     name: 'banks',
     component: Banks
+  },
+  {
+    path: '/banks/:id',
+    name: 'bank',
+    component: Bank,
+    props: true
   },
   {
     path: '/login',

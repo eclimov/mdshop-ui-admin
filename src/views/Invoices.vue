@@ -10,6 +10,8 @@
       />
     </v-card-title>
 
+    <!-- TODO: expand row with details: https://vuetifyjs.com/en/components/data-tables/#expandable-rows-->
+    <!--OR https://codepen.io/francobao/pen/mqxMKP-->
     <v-data-table
       dense
       :items-per-page="items.length"
