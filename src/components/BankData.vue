@@ -25,19 +25,10 @@
           </v-card-title>
 
           <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="bankEdited.name"
-                    autofocus
-                    label="Name"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
+            <BankForm
+              :key="editedItem.name"
+              v-model="editedItem"
+            />
           </v-card-text>
 
           <v-card-actions>
@@ -88,10 +79,11 @@ import { mapActions } from 'vuex'
 import { deleteBank, updateBank } from '@/api/banks'
 import { dateFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
+import BankForm from '@/components/forms/BankForm'
 
 export default {
   name: 'BankData',
-  components: { ModalConfirm },
+  components: { BankForm, ModalConfirm },
   dateFormat,
   props: {
     bank: {
@@ -103,7 +95,7 @@ export default {
   data () {
     return {
       isLoading: false,
-      bankEdited: null,
+      editedItem: null,
       isModalDeleteActive: false,
       dialog: false
     }
@@ -123,7 +115,7 @@ export default {
       this.resetForm()
     },
     resetForm () {
-      this.bankEdited = { ...this.bank }
+      this.editedItem = { ...this.bank }
     },
     async deleteItem () {
       this.isModalDeleteActive = false
@@ -136,10 +128,12 @@ export default {
       }
     },
     async save () {
+      const editedItem = this.editedItem // Prevent the value from resetting
       this.closeDialog()
       this.showLoadingOverlay()
       try {
-        await updateBank(this.bank.id, this.bankEdited)
+        await updateBank(this.bank.id, editedItem)
+        this.editedItem = editedItem // Assign the value to form after successful update
       } finally {
         this.hideLoadingOverlay()
         this.$emit('updated')

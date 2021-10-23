@@ -32,19 +32,10 @@
           </v-card-title>
 
           <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="editedItem.name"
-                    autofocus
-                    label="Name"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
+            <BankForm
+              :key="editedItem.name"
+              v-model="editedItem"
+            />
           </v-card-text>
 
           <v-card-actions>
@@ -123,11 +114,13 @@
 import { createBank, deleteBank, getBanks, updateBank } from '@/api/banks'
 import { dateFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
+import { getBankObject } from '@/utils/forms'
+import BankForm from '@/components/forms/BankForm'
 
 export default {
   name: 'Banks',
   dateFormat,
-  components: { ModalConfirm },
+  components: { BankForm, ModalConfirm },
 
   data () {
     return {
@@ -147,12 +140,7 @@ export default {
         { text: 'Actions', value: 'actions', sortable: false }
       ],
       items: [],
-      editedItem: {
-        name: ''
-      },
-      defaultItem: {
-        name: ''
-      }
+      editedItem: getBankObject()
     }
   },
 
@@ -203,7 +191,7 @@ export default {
 
     editItem (item) {
       this.editedId = item.id
-      this.editedItem = Object.assign({}, item)
+      this.editedItem = { ...item }
       this.dialog = true
     },
 
@@ -225,7 +213,7 @@ export default {
 
     close () {
       this.dialog = false
-      this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedItem = getBankObject()
       this.resetEditedId()
     },
 
