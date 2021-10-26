@@ -5,7 +5,7 @@
         cols="12"
       >
         <v-text-field
-          v-model="bankEdited.name"
+          v-model="itemEdited.name"
           autofocus
           label="Name"
         />
@@ -27,12 +27,12 @@ export default {
 
   data () {
     return {
-      bankEdited: null
+      itemEdited: null
     }
   },
 
   watch: {
-    bankEdited: {
+    itemEdited: {
       handler (val) {
         this.$emit('input', val)
       },
@@ -41,7 +41,7 @@ export default {
   },
 
   created () {
-    this.bankEdited = { ...this.value }
+    this.itemEdited = { ...this.value }
   }
 }
 </script>

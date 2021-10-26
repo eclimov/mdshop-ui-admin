@@ -5,6 +5,7 @@ import Companies from '@/views/Companies'
 import Banks from '@/views/Banks'
 import Login from '@/views/Login'
 import Bank from '@/views/Bank'
+import Company from '@/views/Company'
 
 const routes = [
   {
@@ -21,6 +22,12 @@ const routes = [
     path: '/companies',
     name: 'companies',
     component: Companies
+  },
+  {
+    path: '/companies/:id',
+    name: 'company',
+    component: Company,
+    props: true
   },
   {
     path: '/banks',

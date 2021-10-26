@@ -25,8 +25,7 @@
           </v-card-title>
 
           <v-card-text>
-            <BankForm
-              :key="editedItem.name"
+            <CompanyForm
               v-model="editedItem"
             />
           </v-card-text>
@@ -66,27 +65,55 @@
       >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
-      <h1>{{ bank.name }}</h1>
+      <h1>{{ company.name }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.dateFormat(bank.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>Created At: {{ $options.dateFormat(company.created_at) }}</v-card-subtitle>
+    <v-card-text>
+      <b>Short Name:</b> {{ company.shortName }}
+      <br>
+      <b>Affiliate Number:</b> <span v-if="company.bankAffiliate">{{ company.bankAffiliate.affiliateNumber }}</span>
+      <br>
+      <b>Fiscal Code:</b> {{ company.fiscalCode }}
+      <br>
+      <b>IBAN:</b> {{ company.iban }}
+      <br>
+      <b>Vat:</b> {{ company.vat }}
+    </v-card-text>
+
+    <v-card-actions>
+      <v-btn
+        color="secondary"
+        dark
+        large
+        class="mr-2"
+        title="Create Invoice"
+        :to="{ name:'companies' }"
+      >
+        <span class="material-icons">
+          note_add
+        </span>
+        &nbsp;
+        Create Invoice
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
 <script>
 
 import { mapActions } from 'vuex'
-import { deleteBank, updateBank } from '@/api/banks'
 import { dateFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
-import BankForm from '@/components/forms/BankForm'
+import { deleteCompany, updateCompany } from '@/api/companies'
+import CompanyForm from '@/components/forms/CompanyForm'
 
 export default {
-  name: 'BankData',
-  components: { BankForm, ModalConfirm },
+  name: 'CompanyData',
+  components: { CompanyForm, ModalConfirm },
   dateFormat,
   props: {
-    bank: {
+    company: {
       type: Object,
       required: true
     }
@@ -115,14 +142,14 @@ export default {
       this.resetForm()
     },
     resetForm () {
-      this.editedItem = { ...this.bank }
+      this.editedItem = { ...this.company }
     },
     async deleteItem () {
       this.isModalDeleteActive = false
       this.showLoadingOverlay()
       try {
-        await deleteBank(this.bank.id)
-        await this.$router.push({ name: 'banks' })
+        await deleteCompany(this.company.id)
+        await this.$router.push({ name: 'companies' })
       } finally {
         this.hideLoadingOverlay()
       }
@@ -132,7 +159,7 @@ export default {
       this.closeDialog()
       this.showLoadingOverlay()
       try {
-        await updateBank(this.bank.id, editedItem)
+        await updateCompany(this.company.id, editedItem)
         this.editedItem = editedItem // Assign the value to form after successful update
       } finally {
         this.hideLoadingOverlay()
