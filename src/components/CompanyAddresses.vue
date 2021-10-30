@@ -6,7 +6,7 @@
       @confirm="deleteItemConfirm(editedId)"
     />
 
-    <v-card-title>Bank Affiliates</v-card-title>
+    <v-card-title>Company Addresses</v-card-title>
 
     <v-card-title>
       <v-dialog
@@ -36,13 +36,18 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col
-                  cols="12"
-                >
+                <v-col cols="9">
                   <v-text-field
-                    v-model="editedItem.affiliateNumber"
+                    v-model="editedItem.address"
                     autofocus
-                    label="Affiliate Number"
+                    label="Company Address"
+                  />
+                </v-col>
+
+                <v-col cols="3">
+                  <v-checkbox
+                    v-model="editedItem.juridic"
+                    label="Juridic"
                   />
                 </v-col>
               </v-row>
@@ -89,6 +94,12 @@
       :search="search"
       hide-default-footer
     >
+      <template v-slot:item.juridic="{ item }">
+        <v-icon v-if="item.juridic">
+          mdi-check
+        </v-icon>
+      </template>
+
       <template v-slot:item.created_at="{ item }">
         {{ $options.dateFormat(item.created_at) }}
       </template>
@@ -116,16 +127,17 @@
 
 <script>
 import ModalConfirm from '@/components/ModalConfirm'
-import { createBankAffiliate, deleteBankAffiliate, getBankAffiliatesByBankId, updateBankAffiliate } from '@/api/bankAffiliates'
 import { dateFormat } from '@/utils/string'
-import { getBankAffiliateObject } from '@/utils/forms'
+import { getCompanyAddressObject } from '@/utils/forms'
+import { getCompanyAddressesByCompanyId } from '@/api/companies'
+import { createCompanyAddress, deleteCompanyAddress, updateCompanyAddress } from '@/api/companyAddresses'
 
 export default {
-  name: 'BankAffiliates',
+  name: 'CompanyAddresses',
   components: { ModalConfirm },
   dateFormat,
   props: {
-    bank: {
+    company: {
       type: Object,
       required: true
     }
@@ -144,13 +156,14 @@ export default {
           align: 'start',
           value: 'id'
         },
-        { text: 'Affiliate Number', value: 'affiliateNumber' },
+        { text: 'Address', value: 'address' },
+        { text: 'Is Juridic', value: 'juridic' },
         { text: 'Created At', sortable: false, value: 'created_at' },
         { text: 'Actions', value: 'actions', sortable: false }
       ],
       items: [],
-      editedItem: getBankAffiliateObject(this.bank.id),
-      defaultItem: getBankAffiliateObject(this.bank.id)
+      editedItem: getCompanyAddressObject(this.company.id),
+      defaultItem: getCompanyAddressObject(this.company.id)
     }
   },
 
@@ -174,7 +187,7 @@ export default {
     async fetch () {
       this.isLoading = true
       try {
-        this.items = (await getBankAffiliatesByBankId(this.bank.id)).data
+        this.items = (await getCompanyAddressesByCompanyId(this.company.id)).data
       } finally {
         this.isLoading = false
       }
@@ -189,9 +202,9 @@ export default {
       try {
         this.isLoading = true
         if (editedId) {
-          await updateBankAffiliate(editedId, editedItem)
+          await updateCompanyAddress(editedId, editedItem)
         } else {
-          await createBankAffiliate(editedItem)
+          await createCompanyAddress(editedItem)
         }
       } finally {
         await this.fetch()
@@ -214,7 +227,7 @@ export default {
       this.resetEditedId()
       this.isLoading = true
       try {
-        await deleteBankAffiliate(id)
+        await deleteCompanyAddress(id)
       } finally {
         await this.fetch()
         this.isLoading = false

@@ -6,7 +6,10 @@
       @updated="fetch"
     />
     <hr>
-    CompanyAddresses
+    <CompanyAddresses
+      v-if="company"
+      :company="company"
+    />
     <hr>
     CompanyEmployees
   </div>
@@ -16,10 +19,11 @@
 import CompanyData from '@/components/CompanyData'
 import { mapActions } from 'vuex'
 import { findCompany } from '@/api/companies'
+import CompanyAddresses from '@/components/CompanyAddresses'
 
 export default {
   name: 'Company',
-  components: { CompanyData },
+  components: { CompanyAddresses, CompanyData },
   props: {
     id: {
       type: [Number, String],
