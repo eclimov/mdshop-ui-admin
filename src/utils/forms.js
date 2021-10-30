@@ -32,3 +32,11 @@ export const getCompanyAddressObject = (companyId) => {
     company: `${API_PATH_COMPANIES}/${companyId}`
   }
 }
+
+export const getCompanyEmployeeObject = (companyId) => {
+  return {
+    name: '',
+    position: null,
+    company: `${API_PATH_COMPANIES}/${companyId}`
+  }
+}

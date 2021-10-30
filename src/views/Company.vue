@@ -11,7 +11,10 @@
       :company="company"
     />
     <hr>
-    CompanyEmployees
+    <CompanyEmployees
+      v-if="company"
+      :company="company"
+    />
   </div>
 </template>
 
@@ -20,10 +23,11 @@ import CompanyData from '@/components/CompanyData'
 import { mapActions } from 'vuex'
 import { findCompany } from '@/api/companies'
 import CompanyAddresses from '@/components/CompanyAddresses'
+import CompanyEmployees from '@/components/CompanyEmployees'
 
 export default {
   name: 'Company',
-  components: { CompanyAddresses, CompanyData },
+  components: { CompanyEmployees, CompanyAddresses, CompanyData },
   props: {
     id: {
       type: [Number, String],
