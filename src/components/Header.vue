@@ -17,30 +17,42 @@
       </router-link>
     </div>
 
-    <v-btn
-      text
-      :to="{ name: 'invoices' }"
-    >
-      Invoices
-    </v-btn>
+    <div v-if="isAuthenticated">
+      <v-btn
+        text
+        :to="{ name: 'invoices' }"
+      >
+        Invoices
+      </v-btn>
 
-    <v-btn
-      text
-      :to="{ name: 'companies' }"
-    >
-      Companies
-    </v-btn>
+      <v-btn
+        text
+        :to="{ name: 'companies' }"
+      >
+        Companies
+      </v-btn>
 
-    <v-btn
-      text
-      :to="{ name: 'banks' }"
-    >
-      Banks
-    </v-btn>
+      <v-btn
+        text
+        :to="{ name: 'banks' }"
+      >
+        Banks
+      </v-btn>
+    </div>
 
     <v-spacer />
 
     <v-btn
+      v-if="isAuthenticated"
+      icon
+      title="Logout"
+      color="warning"
+      @click="logout"
+    >
+      <v-icon>mdi-logout</v-icon>
+    </v-btn>
+    <v-btn
+      v-else
       icon
       title="Login"
       :to="{ name: 'login' }"
@@ -51,8 +63,31 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
-  name: 'Header'
+  name: 'Header',
+
+  computed: {
+    ...mapGetters({
+      userEmail: 'user/email'
+    }),
+
+    isAuthenticated () {
+      return !!this.userEmail
+    }
+  },
+
+  methods: {
+    ...mapActions({
+      userLogout: 'user/logout'
+    }),
+
+    async logout () {
+      await this.userLogout()
+      await this.$router.push({ name: 'home' })
+    }
+  }
 }
 </script>
 

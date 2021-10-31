@@ -21,6 +21,7 @@
       <v-col
         cols="12"
       >
+        <!-- TODO: improve UX with validation and 'counter' prop -->
         <v-text-field
           v-model="itemEdited.iban"
           label="IBAN"

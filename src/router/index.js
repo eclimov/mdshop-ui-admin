@@ -6,6 +6,7 @@ import Banks from '@/views/Banks'
 import Login from '@/views/Login'
 import Bank from '@/views/Bank'
 import Company from '@/views/Company'
+import store from '@/plugins/store'
 
 const routes = [
   {
@@ -51,6 +52,13 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!store.getters['user/email']
+  if (!['home', 'login'].includes(to.name) && !isAuthenticated) next({ name: 'login' })
+  if (['login'].includes(to.name) && isAuthenticated) next({ name: 'home' })
+  else next()
 })
 
 export default router
