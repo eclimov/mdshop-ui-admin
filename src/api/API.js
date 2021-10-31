@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from '@/plugins/store'
+import router from '@/router'
 import { API_PATH_REFRESH_TOKEN } from '@/api/auth'
 
 const apiUrl = process.env.VUE_APP_API_URL || ''
@@ -38,8 +39,13 @@ axiosInstance.interceptors.response.use((response) => {
     !originalRequest._retry
   ) {
     originalRequest._retry = true
-    await store.dispatch('user/refreshAccessToken')
-    return axiosInstance(originalRequest)
+    try {
+      await store.dispatch('user/refreshAccessToken')
+      return axiosInstance(originalRequest)
+    } catch (refreshTokenError) { // In case of invalid refresh token, logout and redirect to home
+      await store.dispatch('user/logout')
+      await router.push({ name: 'home' })
+    }
   }
   return Promise.reject(error)
 })
