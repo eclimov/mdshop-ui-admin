@@ -28,11 +28,11 @@
         </template>
         <v-card>
           <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
+            <span class="text-h5">New Item</span>
           </v-card-title>
 
           <v-card-text>
-            <BankForm
+            <UserForm
               :key="editedItem.id"
               v-model="editedItem"
             />
@@ -78,9 +78,9 @@
       :search="search"
       hide-default-footer
     >
-      <template v-slot:item.name="{ item }">
-        <router-link :to="{ name: 'bank', params: { id: item.id } }">
-          {{ item.name }}
+      <template v-slot:item.email="{ item }">
+        <router-link :to="{ name: 'user', params: { id: item.id } }">
+          {{ item.email }}
         </router-link>
       </template>
 
@@ -89,14 +89,6 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          color="warning"
-          @click="editItem(item)"
-        >
-          mdi-pencil
-        </v-icon>
         <v-icon
           small
           color="error"
@@ -111,16 +103,17 @@
 
 <script>
 
-import { createBank, deleteBank, getBanks, updateBank } from '@/api/banks'
 import { dateFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
-import { getBankObject } from '@/utils/forms'
-import BankForm from '@/components/forms/BankForm'
+import { getUserObject } from '@/utils/forms'
+import UserForm from '@/components/forms/UserForm'
+import { createUser, deleteUser, getUsers } from '@/api/users'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  name: 'Banks',
+  name: 'Users',
   dateFormat,
-  components: { BankForm, ModalConfirm },
+  components: { UserForm, ModalConfirm },
 
   data () {
     return {
@@ -135,19 +128,19 @@ export default {
           align: 'start',
           value: 'id'
         },
-        { text: 'Name', value: 'name' },
+        { text: 'Email', value: 'email' },
         { text: 'Created At', sortable: false, value: 'created_at' },
         { text: 'Actions', value: 'actions', sortable: false }
       ],
       items: [],
-      editedItem: getBankObject()
+      editedItem: getUserObject()
     }
   },
 
   computed: {
-    formTitle () {
-      return this.editedId ? 'Edit Item' : 'New Item'
-    }
+    ...mapGetters({
+      userEmail: 'user/email'
+    })
   },
 
   watch: {
@@ -161,38 +154,31 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      userLogout: 'user/logout'
+    }),
+
     async fetch () {
       this.isLoading = true
       try {
-        this.items = (await getBanks()).data
+        this.items = (await getUsers()).data
       } finally {
         this.isLoading = false
       }
     },
 
     async save () {
-      const editedId = this.editedId
       const editedItem = this.editedItem
 
       this.close()
 
       try {
         this.isLoading = true
-        if (editedId) {
-          await updateBank(editedId, editedItem)
-        } else {
-          await createBank(editedItem)
-        }
+        await createUser(editedItem)
       } finally {
         await this.fetch()
         this.isLoading = false
       }
-    },
-
-    editItem (item) {
-      this.editedId = item.id
-      this.editedItem = { ...item }
-      this.dialog = true
     },
 
     deleteItem (item) {
@@ -204,7 +190,7 @@ export default {
       this.resetEditedId()
       this.isLoading = true
       try {
-        await deleteBank(id)
+        await deleteUser(id)
       } finally {
         await this.fetch()
         this.isLoading = false
@@ -213,7 +199,7 @@ export default {
 
     close () {
       this.dialog = false
-      this.editedItem = getBankObject()
+      this.editedItem = getUserObject()
       this.resetEditedId()
     },
 

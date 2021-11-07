@@ -38,19 +38,34 @@
       >
         Banks
       </v-btn>
+
+      <!--No need to display the following link to users-->
+      <!--
+      <v-btn
+        text
+        :to="{ name: 'users' }"
+      >
+        Users
+      </v-btn>
+      -->
     </div>
 
     <v-spacer />
 
-    <v-btn
-      v-if="isAuthenticated"
-      icon
-      title="Logout"
-      color="warning"
-      @click="logout"
-    >
-      <v-icon>mdi-logout</v-icon>
-    </v-btn>
+    <template v-if="isAuthenticated">
+      <router-link :to="{ name: 'user', params: { id: userId } }">
+        {{ userEmail }}
+      </router-link>
+      <v-btn
+        class="ml-2"
+        icon
+        title="Logout"
+        color="warning"
+        @click="logout"
+      >
+        <v-icon>mdi-logout</v-icon>
+      </v-btn>
+    </template>
     <v-btn
       v-else
       icon
@@ -70,6 +85,7 @@ export default {
 
   computed: {
     ...mapGetters({
+      userId: 'user/id',
       userEmail: 'user/email'
     }),
 

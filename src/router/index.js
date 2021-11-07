@@ -7,6 +7,8 @@ import Login from '@/views/Login'
 import Bank from '@/views/Bank'
 import Company from '@/views/Company'
 import store from '@/plugins/store'
+import Users from '@/views/Users'
+import User from '@/views/User'
 
 const routes = [
   {
@@ -39,6 +41,17 @@ const routes = [
     path: '/banks/:id',
     name: 'bank',
     component: Bank,
+    props: true
+  },
+  {
+    path: '/users',
+    name: 'users',
+    component: Users
+  },
+  {
+    path: '/users/:id',
+    name: 'user',
+    component: User,
     props: true
   },
   {

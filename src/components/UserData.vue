@@ -25,7 +25,7 @@
           </v-card-title>
 
           <v-card-text>
-            <BankForm
+            <UserForm
               :key="editedItem.id"
               v-model="editedItem"
             />
@@ -66,27 +66,26 @@
       >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
-      <h1>{{ bank.name }}</h1>
+      <h1>{{ user.email }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.dateFormat(bank.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>Created At: {{ $options.dateFormat(user.created_at) }}</v-card-subtitle>
   </v-card>
 </template>
 
 <script>
-
-import { mapActions } from 'vuex'
-import { deleteBank, updateBank } from '@/api/banks'
+import { mapActions, mapGetters } from 'vuex'
 import { dateFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
-import BankForm from '@/components/forms/BankForm'
+import UserForm from '@/components/forms/UserForm'
+import { deleteUser, updateUser } from '@/api/users'
 
 export default {
-  name: 'BankData',
-  components: { BankForm, ModalConfirm },
+  name: 'UserData',
+  components: { UserForm, ModalConfirm },
   dateFormat,
   props: {
-    bank: {
+    user: {
       type: Object,
       required: true
     }
@@ -101,12 +100,19 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters({
+      userEmail: 'user/email'
+    })
+  },
+
   created () {
     this.resetForm()
   },
 
   methods: {
     ...mapActions({
+      userLogout: 'user/logout',
       showLoadingOverlay: 'general/showLoadingOverlay',
       hideLoadingOverlay: 'general/hideLoadingOverlay'
     }),
@@ -115,14 +121,14 @@ export default {
       this.resetForm()
     },
     resetForm () {
-      this.editedItem = { ...this.bank }
+      this.editedItem = { ...this.user }
     },
     async deleteItem () {
       this.isModalDeleteActive = false
       this.showLoadingOverlay()
       try {
-        await deleteBank(this.bank.id)
-        await this.$router.push({ name: 'banks' })
+        await deleteUser(this.user.id)
+        await this.$router.push({ name: 'users' })
       } finally {
         this.hideLoadingOverlay()
       }
@@ -132,8 +138,13 @@ export default {
       this.closeDialog()
       this.showLoadingOverlay()
       try {
-        await updateBank(this.bank.id, editedItem)
-        this.editedItem = editedItem // Assign the value to form after successful update
+        await updateUser(this.user.id, editedItem)
+        if (this.editedItem.email === this.userEmail) {
+          await this.userLogout()
+          await this.$router.push({ name: 'home' })
+        }
+
+        this.editedItem = { ...editedItem } // Assign the value to form after successful update
       } finally {
         this.hideLoadingOverlay()
         this.$emit('updated')

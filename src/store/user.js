@@ -1,6 +1,7 @@
 import { login, refreshAccessToken } from '@/api/auth'
 
 const defaultState = {
+  id: null,
   email: null,
   accessToken: null,
   refreshToken: null
@@ -10,6 +11,7 @@ export default {
   namespaced: true,
   state: { ...defaultState },
   getters: {
+    id: (state) => state.id,
     email: (state) => state.email,
     accessToken: (state) => state.accessToken,
     refreshToken: (state) => state.refreshToken
@@ -18,6 +20,7 @@ export default {
     async login ({ commit }, data) {
       const response = (await login(data)).data
       commit('SET_EMAIL', data.email)
+      commit('SET_ID', response.user_id)
       commit('SET_ACCESS_TOKEN', response.token)
       commit('SET_REFRESH_TOKEN', response.refresh_token)
     },
@@ -30,6 +33,9 @@ export default {
     }
   },
   mutations: {
+    SET_ID: (state, id) => {
+      state.id = id
+    },
     SET_EMAIL: (state, email) => {
       state.email = email
     },

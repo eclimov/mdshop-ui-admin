@@ -40,3 +40,10 @@ export const getCompanyEmployeeObject = (companyId) => {
     company: `${API_PATH_COMPANIES}/${companyId}`
   }
 }
+
+export const getUserObject = () => {
+  return {
+    email: '',
+    password: ''
+  }
+}
