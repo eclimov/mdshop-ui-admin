@@ -53,9 +53,12 @@
     <v-spacer />
 
     <template v-if="isAuthenticated">
-      <router-link :to="{ name: 'user', params: { id: userId } }">
-        {{ userEmail }}
-      </router-link>
+      <div class="d-flex flex-column">
+        <router-link :to="{ name: 'user', params: { id: userId } }">
+          {{ userEmail }}
+        </router-link>
+        <span class="text-caption">{{ userCompanyName }}</span>
+      </div>
       <v-btn
         class="ml-2"
         icon
@@ -86,6 +89,7 @@ export default {
   computed: {
     ...mapGetters({
       userId: 'user/id',
+      userCompanyName: 'user/companyName',
       userEmail: 'user/email'
     }),
 

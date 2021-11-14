@@ -2,12 +2,23 @@
   <v-container>
     <v-row>
       <v-col
-        cols="12"
+        cols="8"
       >
         <v-text-field
           v-model="itemEdited.email"
           autofocus
           label="Email"
+        />
+      </v-col>
+      <v-col
+        cols="4"
+      >
+        <v-select
+          v-model="itemEdited.company"
+          :items="companiesOptions"
+          item-text="text"
+          item-value="value"
+          label="Company"
         />
       </v-col>
     </v-row>
@@ -30,6 +41,8 @@
 </template>
 
 <script>
+import { API_PATH_COMPANIES, getCompanies } from '@/api/companies'
+
 export default {
   name: 'UserForm',
 
@@ -43,7 +56,8 @@ export default {
   data () {
     return {
       isPasswordValueShown: false,
-      itemEdited: null
+      itemEdited: null,
+      companiesOptions: []
     }
   },
 
@@ -56,8 +70,24 @@ export default {
     }
   },
 
-  created () {
-    this.itemEdited = { ...this.value }
+  async created () {
+    this.itemEdited = {
+      ...this.value,
+      company: this.generateCompanyPath(this.value.company?.id || null)
+    }
+    const companies = (await getCompanies()).data
+    this.companiesOptions = [
+      { text: '--Select an option--', value: null },
+      ...companies.map((company) => {
+        return { text: company.name, value: this.generateCompanyPath(company.id) }
+      })
+    ]
+  },
+
+  methods: {
+    generateCompanyPath (id) {
+      return `${API_PATH_COMPANIES}/${id}`
+    }
   }
 }
 </script>

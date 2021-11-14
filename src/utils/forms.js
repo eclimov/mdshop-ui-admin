@@ -44,6 +44,7 @@ export const getCompanyEmployeeObject = (companyId) => {
 export const getUserObject = () => {
   return {
     email: '',
-    password: ''
+    password: '',
+    company: null
   }
 }

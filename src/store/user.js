@@ -2,6 +2,7 @@ import { login, refreshAccessToken } from '@/api/auth'
 
 const defaultState = {
   id: null,
+  companyName: null,
   email: null,
   accessToken: null,
   refreshToken: null
@@ -12,6 +13,7 @@ export default {
   state: { ...defaultState },
   getters: {
     id: (state) => state.id,
+    companyName: (state) => state.companyName,
     email: (state) => state.email,
     accessToken: (state) => state.accessToken,
     refreshToken: (state) => state.refreshToken
@@ -21,6 +23,7 @@ export default {
       const response = (await login(data)).data
       commit('SET_EMAIL', data.email)
       commit('SET_ID', response.user_id)
+      commit('SET_COMPANY_NAME', response.company_name)
       commit('SET_ACCESS_TOKEN', response.token)
       commit('SET_REFRESH_TOKEN', response.refresh_token)
     },
@@ -35,6 +38,9 @@ export default {
   mutations: {
     SET_ID: (state, id) => {
       state.id = id
+    },
+    SET_COMPANY_NAME: (state, companyName) => {
+      state.companyName = companyName
     },
     SET_EMAIL: (state, email) => {
       state.email = email

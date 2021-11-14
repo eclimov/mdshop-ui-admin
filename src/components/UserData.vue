@@ -69,7 +69,11 @@
       <h1>{{ user.email }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.dateFormat(user.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>
+      Created At: {{ $options.dateFormat(user.created_at) }}
+      <br>
+      Company: {{ user.company ? user.company.name : '' }}
+    </v-card-subtitle>
   </v-card>
 </template>
 
