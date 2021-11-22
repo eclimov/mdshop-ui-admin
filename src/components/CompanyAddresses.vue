@@ -101,7 +101,7 @@
       </template>
 
       <template v-slot:item.created_at="{ item }">
-        {{ $options.dateFormat(item.created_at) }}
+        {{ $options.datetimeFormat(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -127,7 +127,7 @@
 
 <script>
 import ModalConfirm from '@/components/ModalConfirm'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import { getCompanyAddressObject } from '@/utils/forms'
 import { getCompanyAddressesByCompanyId } from '@/api/companies'
 import { createCompanyAddress, deleteCompanyAddress, updateCompanyAddress } from '@/api/companyAddresses'
@@ -135,7 +135,7 @@ import { createCompanyAddress, deleteCompanyAddress, updateCompanyAddress } from
 export default {
   name: 'CompanyAddresses',
   components: { ModalConfirm },
-  dateFormat,
+  datetimeFormat,
   props: {
     company: {
       type: Object,

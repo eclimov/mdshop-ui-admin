@@ -1,6 +1,8 @@
 import API from '@/api/API'
 
 export const API_PATH_COMPANIES = '/companies'
+export const generateCompanyPath = (companyId) => `${API_PATH_COMPANIES}/${companyId}`
+
 export const getCompanies = () => API.get(API_PATH_COMPANIES)
 export const findCompany = (id) => API.get(`${API_PATH_COMPANIES}/${id}`)
 export const getCompanyAddressesByCompanyId = (id) => API.get(`${API_PATH_COMPANIES}/${id}/addresses`)

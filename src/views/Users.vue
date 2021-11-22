@@ -85,7 +85,7 @@
       </template>
 
       <template v-slot:item.created_at="{ item }">
-        {{ $options.dateFormat(item.created_at) }}
+        {{ $options.datetimeFormat(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -103,7 +103,7 @@
 
 <script>
 
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
 import { getUserObject } from '@/utils/forms'
 import UserForm from '@/components/forms/UserForm'
@@ -112,7 +112,7 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Users',
-  dateFormat,
+  datetimeFormat,
   components: { UserForm, ModalConfirm },
 
   data () {

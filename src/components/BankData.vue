@@ -69,7 +69,7 @@
       <h1>{{ bank.name }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.dateFormat(bank.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>Created At: {{ $options.datetimeFormat(bank.created_at) }}</v-card-subtitle>
   </v-card>
 </template>
 
@@ -77,14 +77,14 @@
 
 import { mapActions } from 'vuex'
 import { deleteBank, updateBank } from '@/api/banks'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
 import BankForm from '@/components/forms/BankForm'
 
 export default {
   name: 'BankData',
   components: { BankForm, ModalConfirm },
-  dateFormat,
+  datetimeFormat,
   props: {
     bank: {
       type: Object,

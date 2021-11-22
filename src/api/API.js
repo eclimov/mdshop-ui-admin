@@ -3,10 +3,10 @@ import store from '@/plugins/store'
 import router from '@/router'
 import { API_PATH_REFRESH_TOKEN } from '@/api/auth'
 
-const apiUrl = process.env.VUE_APP_API_URL || ''
+export const apiUrl = `${process.env.VUE_APP_API_URL || ''}/api`
 
 const axiosInstance = axios.create({
-  baseURL: `${apiUrl}/api`,
+  baseURL: apiUrl,
   headers: {
     Accept: 'application/json'
   }

@@ -68,7 +68,7 @@
       <h1>{{ company.name }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.dateFormat(company.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>Created At: {{ $options.datetimeFormat(company.created_at) }}</v-card-subtitle>
     <v-card-text>
       <b>Short Name:</b> {{ company.shortName }}
       <br>
@@ -88,7 +88,7 @@
         large
         class="mr-2"
         title="Create Invoice"
-        :to="{ name:'companies' }"
+        :to="{ name: 'create-invoice', params: { buyerCompanyId: company.id }}"
       >
         <span class="material-icons">
           note_add
@@ -103,7 +103,7 @@
 <script>
 
 import { mapActions } from 'vuex'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
 import { deleteCompany, updateCompany } from '@/api/companies'
 import CompanyForm from '@/components/forms/CompanyForm'
@@ -111,7 +111,7 @@ import CompanyForm from '@/components/forms/CompanyForm'
 export default {
   name: 'CompanyData',
   components: { CompanyForm, ModalConfirm },
-  dateFormat,
+  datetimeFormat,
   props: {
     company: {
       type: Object,

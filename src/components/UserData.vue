@@ -70,7 +70,7 @@
     </v-card-title>
 
     <v-card-subtitle>
-      Created At: {{ $options.dateFormat(user.created_at) }}
+      Created At: {{ $options.datetimeFormat(user.created_at) }}
       <br>
       Company: {{ user.company ? user.company.name : '' }}
     </v-card-subtitle>
@@ -79,7 +79,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
 import UserForm from '@/components/forms/UserForm'
 import { deleteUser, updateUser } from '@/api/users'
@@ -87,7 +87,7 @@ import { deleteUser, updateUser } from '@/api/users'
 export default {
   name: 'UserData',
   components: { UserForm, ModalConfirm },
-  dateFormat,
+  datetimeFormat,
   props: {
     user: {
       type: Object,

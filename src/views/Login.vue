@@ -63,8 +63,7 @@ export default {
       ],
       passwordRules: [
         v => !!v || 'Password is required'
-      ],
-      select: null
+      ]
     }
   },
   methods: {

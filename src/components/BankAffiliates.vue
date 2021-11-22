@@ -90,7 +90,7 @@
       hide-default-footer
     >
       <template v-slot:item.created_at="{ item }">
-        {{ $options.dateFormat(item.created_at) }}
+        {{ $options.datetimeFormat(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -117,13 +117,13 @@
 <script>
 import ModalConfirm from '@/components/ModalConfirm'
 import { createBankAffiliate, deleteBankAffiliate, getBankAffiliatesByBankId, updateBankAffiliate } from '@/api/bankAffiliates'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import { getBankAffiliateObject } from '@/utils/forms'
 
 export default {
   name: 'BankAffiliates',
   components: { ModalConfirm },
-  dateFormat,
+  datetimeFormat,
   props: {
     bank: {
       type: Object,

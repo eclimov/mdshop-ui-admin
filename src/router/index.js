@@ -9,6 +9,7 @@ import Company from '@/views/Company'
 import store from '@/plugins/store'
 import Users from '@/views/Users'
 import User from '@/views/User'
+import CreateInvoice from '@/views/CreateInvoice'
 
 const routes = [
   {
@@ -30,6 +31,12 @@ const routes = [
     path: '/companies/:id',
     name: 'company',
     component: Company,
+    props: true
+  },
+  {
+    path: '/companies/:buyerCompanyId/create-invoice',
+    name: 'create-invoice',
+    component: CreateInvoice,
     props: true
   },
   {

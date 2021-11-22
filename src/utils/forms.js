@@ -1,5 +1,5 @@
 import { API_PATH_BANKS } from '@/api/banks'
-import { API_PATH_COMPANIES } from '@/api/companies'
+import { generateCompanyPath } from '@/api/companies'
 
 export const getBankObject = () => {
   return {
@@ -29,7 +29,7 @@ export const getCompanyAddressObject = (companyId) => {
   return {
     address: '',
     juridic: false,
-    company: `${API_PATH_COMPANIES}/${companyId}`
+    company: generateCompanyPath(companyId)
   }
 }
 
@@ -37,7 +37,7 @@ export const getCompanyEmployeeObject = (companyId) => {
   return {
     name: '',
     position: null,
-    company: `${API_PATH_COMPANIES}/${companyId}`
+    company: generateCompanyPath(companyId)
   }
 }
 

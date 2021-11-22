@@ -96,7 +96,7 @@
       hide-default-footer
     >
       <template v-slot:item.created_at="{ item }">
-        {{ $options.dateFormat(item.created_at) }}
+        {{ $options.datetimeFormat(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -122,15 +122,16 @@
 
 <script>
 import ModalConfirm from '@/components/ModalConfirm'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import { getCompanyEmployeeObject } from '@/utils/forms'
 import { getCompanyEmployeesByCompanyId } from '@/api/companies'
 import { createCompanyEmployee, deleteCompanyEmployee, updateCompanyEmployee } from '@/api/companyEmployees'
+import { positionsEnum } from '@/utils/enums'
 
 export default {
   name: 'CompanyEmployees',
   components: { ModalConfirm },
-  dateFormat,
+  datetimeFormat,
   props: {
     company: {
       type: Object,
@@ -146,8 +147,8 @@ export default {
       editedId: 0,
       search: '',
       positions: [
-        'Consultant',
-        'Director'
+        positionsEnum.CONSULTANT,
+        positionsEnum.DIRECTOR
       ],
       headers: [
         {

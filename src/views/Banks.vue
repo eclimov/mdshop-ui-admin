@@ -85,7 +85,7 @@
       </template>
 
       <template v-slot:item.created_at="{ item }">
-        {{ $options.dateFormat(item.created_at) }}
+        {{ $options.datetimeFormat(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -112,14 +112,14 @@
 <script>
 
 import { createBank, deleteBank, getBanks, updateBank } from '@/api/banks'
-import { dateFormat } from '@/utils/string'
+import { datetimeFormat } from '@/utils/string'
 import ModalConfirm from '@/components/ModalConfirm'
 import { getBankObject } from '@/utils/forms'
 import BankForm from '@/components/forms/BankForm'
 
 export default {
   name: 'Banks',
-  dateFormat,
+  datetimeFormat,
   components: { BankForm, ModalConfirm },
 
   data () {

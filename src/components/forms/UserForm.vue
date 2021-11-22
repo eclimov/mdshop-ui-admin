@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { API_PATH_COMPANIES, getCompanies } from '@/api/companies'
+import { generateCompanyPath, getCompanies } from '@/api/companies'
 
 export default {
   name: 'UserForm',
@@ -73,21 +73,15 @@ export default {
   async created () {
     this.itemEdited = {
       ...this.value,
-      company: this.generateCompanyPath(this.value.company?.id || null)
+      company: generateCompanyPath(this.value.company?.id || null)
     }
     const companies = (await getCompanies()).data
     this.companiesOptions = [
       { text: '--Select an option--', value: null },
       ...companies.map((company) => {
-        return { text: company.name, value: this.generateCompanyPath(company.id) }
+        return { text: company.name, value: generateCompanyPath(company.id) }
       })
     ]
-  },
-
-  methods: {
-    generateCompanyPath (id) {
-      return `${API_PATH_COMPANIES}/${id}`
-    }
   }
 }
 </script>
