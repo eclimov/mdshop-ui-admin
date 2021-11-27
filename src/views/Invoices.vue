@@ -23,6 +23,12 @@
       :search="search"
       hide-default-footer
     >
+      <template v-slot:item.id="{ item }">
+        <router-link :to="{ name: 'invoice', params: { id: item.id } }">
+          {{ item.id }}
+        </router-link>
+      </template>
+
       <template v-slot:item.buyer.name="{ item }">
         <router-link :to="{ name: 'company', params: { id: item.buyer.id } }">
           {{ item.buyer.name }}
@@ -48,9 +54,10 @@
 
 <script>
 
-import { generateInvoiceDocument, getInvoiceDownloadLink, getInvoices } from '@/api/invoices'
+import { getInvoices } from '@/api/invoices'
 import { datetimeFormat } from '@/utils/string'
 import { mapActions } from 'vuex'
+import { downloadInvoiceDocument } from '@/utils/files'
 
 export default {
   name: 'Invoices',
@@ -93,8 +100,7 @@ export default {
     async download (id) {
       try {
         this.showLoadingOverlay()
-        await generateInvoiceDocument(id)
-        window.location = getInvoiceDownloadLink(id)
+        await downloadInvoiceDocument(id)
       } finally {
         this.hideLoadingOverlay()
       }

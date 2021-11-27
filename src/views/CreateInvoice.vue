@@ -335,12 +335,12 @@ export default {
       if (this.$refs.form.validate()) {
         this.showLoadingOverlay()
         try {
-          await createInvoice({
+          const invoice = (await createInvoice({
             ...this.form,
             orderDate: (new Date(this.form.orderDate)).toISOString(),
             deliveryDate: (new Date(this.form.deliveryDate)).toISOString()
-          })
-          await this.$router.push({ name: 'invoices' })
+          })).data
+          await this.$router.push({ name: 'invoice', params: { id: invoice.id } })
         } finally {
           this.hideLoadingOverlay()
         }
