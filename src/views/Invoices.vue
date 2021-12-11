@@ -1,5 +1,11 @@
 <template>
   <v-card>
+    <ModalConfirm
+      v-if="isModalDeleteActive"
+      @cancel="resetEditedId"
+      @confirm="deleteItemConfirm(editedId)"
+    />
+
     <v-card-title>
       <v-text-field
         v-model="search"
@@ -47,6 +53,13 @@
         >
           mdi-download
         </v-icon>
+        &nbsp;
+        <v-icon
+          color="error"
+          @click="deleteItem(item)"
+        >
+          mdi-delete
+        </v-icon>
       </template>
     </v-data-table>
   </v-card>
@@ -54,19 +67,22 @@
 
 <script>
 
-import { getInvoices } from '@/api/invoices'
+import { getInvoices, deleteInvoice } from '@/api/invoices'
 import { datetimeFormat } from '@/utils/string'
 import { mapActions } from 'vuex'
 import { downloadInvoiceDocument } from '@/utils/files'
+import ModalConfirm from '../components/ModalConfirm'
 
 export default {
   name: 'Invoices',
   datetimeFormat,
-  components: {},
+  components: { ModalConfirm },
 
   data () {
     return {
       isLoading: false,
+      isModalDeleteActive: false,
+      editedId: 0,
       search: '',
       headers: [
         {
@@ -83,12 +99,7 @@ export default {
   },
 
   async created () {
-    this.isLoading = true
-    try {
-      this.items = (await getInvoices()).data
-    } finally {
-      this.isLoading = false
-    }
+    await this.fetch()
   },
 
   methods: {
@@ -97,12 +108,42 @@ export default {
       hideLoadingOverlay: 'general/hideLoadingOverlay'
     }),
 
+    async fetch () {
+      this.isLoading = true
+      try {
+        this.items = (await getInvoices()).data
+      } finally {
+        this.isLoading = false
+      }
+    },
+
     async download (id) {
       try {
         this.showLoadingOverlay()
         await downloadInvoiceDocument(id)
       } finally {
         this.hideLoadingOverlay()
+      }
+    },
+
+    resetEditedId () {
+      this.editedId = 0
+      this.isModalDeleteActive = false
+    },
+
+    deleteItem (item) {
+      this.editedId = item.id
+      this.isModalDeleteActive = true
+    },
+
+    async deleteItemConfirm (id) {
+      this.resetEditedId()
+      this.isLoading = true
+      try {
+        await deleteInvoice(id)
+      } finally {
+        await this.fetch()
+        this.isLoading = false
       }
     }
   }
