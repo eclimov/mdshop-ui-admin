@@ -19,7 +19,7 @@
           <v-text-field
             v-model="form.password"
             :rules="passwordRules"
-            label="Password"
+            :label="$t('password')"
             :append-icon="isPasswordValueShown ? 'mdi-eye-off' : 'mdi-eye'"
             :type="isPasswordValueShown ? 'text' : 'password'"
             required
@@ -33,7 +33,7 @@
             class="mr-4"
             type="submit"
           >
-            Submit
+            {{ $t('submit') }}
           </v-btn>
         </v-form>
       </v-col>
@@ -58,11 +58,11 @@ export default {
         password: ''
       },
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+        v => !!v || this.$t('validation.required'),
+        v => /.+@.+\..+/.test(v) || this.$t('validation.invalid')
       ],
       passwordRules: [
-        v => !!v || 'Password is required'
+        v => !!v || this.$t('validation.required')
       ]
     }
   },

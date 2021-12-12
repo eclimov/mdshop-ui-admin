@@ -13,7 +13,7 @@
             icon
             v-bind="attrs"
             class="mr-2"
-            title="Edit Item"
+            :title="$t('edit-item')"
             v-on="on"
           >
             <v-icon>mdi-pencil</v-icon>
@@ -21,7 +21,7 @@
         </template>
         <v-card>
           <v-card-title>
-            <span class="text-h5">Edit Item</span>
+            <span class="text-h5">{{ $t('edit-item') }}</span>
           </v-card-title>
 
           <v-card-text>
@@ -38,14 +38,14 @@
               text
               @click="closeDialog"
             >
-              Cancel
+              {{ $t('cancel') }}
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="save"
             >
-              Save
+              {{ $t('save') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -61,7 +61,7 @@
         large
         icon
         class="mr-2"
-        title="Delete Item"
+        :title="$t('delete-item')"
         @click="isModalDeleteActive = true"
       >
         <v-icon>mdi-delete</v-icon>
@@ -69,7 +69,7 @@
       <h1>{{ bank.name }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.datetimeFormat(bank.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>{{ $t('created-at') }}: {{ $options.datetimeFormat(bank.created_at) }}</v-card-subtitle>
   </v-card>
 </template>
 

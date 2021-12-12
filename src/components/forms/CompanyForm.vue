@@ -5,14 +5,14 @@
         <v-text-field
           v-model="itemEdited.name"
           autofocus
-          label="Name"
+          :label="$t('name')"
         />
       </v-col>
 
       <v-col cols="4">
         <v-text-field
           v-model="itemEdited.shortName"
-          label="Short Name"
+          :label="$t('name-short')"
         />
       </v-col>
     </v-row>
@@ -33,7 +33,7 @@
       <v-col cols="6">
         <v-text-field
           v-model="itemEdited.fiscalCode"
-          label="Fiscal Code"
+          :label="$t('fiscal-code')"
         />
       </v-col>
 
@@ -56,7 +56,7 @@
           :items="bankAffiliatesOptions"
           dense
           filled
-          label="Bank Affiliate"
+          :label="$t('bank-affiliate')"
         />
       </v-col>
     </v-row>

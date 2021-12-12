@@ -6,7 +6,7 @@
       @confirm="deleteItemConfirm(editedId)"
     />
 
-    <v-card-title>Bank Affiliates</v-card-title>
+    <v-card-title>{{ $t('bank-affiliates') }}</v-card-title>
 
     <v-card-title>
       <v-dialog
@@ -20,7 +20,7 @@
             large
             v-bind="attrs"
             class="mr-2"
-            title="New Item"
+            :title="$t('new-item')"
             v-on="on"
           >
             <span class="material-icons">
@@ -42,7 +42,7 @@
                   <v-text-field
                     v-model="editedItem.affiliateNumber"
                     autofocus
-                    label="Affiliate Number"
+                    :label="$t('affiliate-number')"
                   />
                 </v-col>
               </v-row>
@@ -56,14 +56,14 @@
               text
               @click="close"
             >
-              Cancel
+              {{ $t('cancel') }}
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="save"
             >
-              Save
+              {{ $t('save') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -72,7 +72,7 @@
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        label="Search"
+        :label="$t('search')"
         single-line
         hide-details
       />
@@ -85,7 +85,7 @@
       :items="items"
       class="elevation-1"
       :loading="isLoading"
-      loading-text="Loading... Please wait"
+      :loading-text="$t('loading-text')"
       :search="search"
       hide-default-footer
     >
@@ -144,9 +144,9 @@ export default {
           align: 'start',
           value: 'id'
         },
-        { text: 'Affiliate Number', value: 'affiliateNumber' },
-        { text: 'Created At', sortable: false, value: 'created_at' },
-        { text: 'Actions', value: 'actions', sortable: false }
+        { text: this.$t('affiliate-number'), value: 'affiliateNumber' },
+        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
+        { text: this.$t('actions'), value: 'actions', sortable: false }
       ],
       items: [],
       editedItem: getBankAffiliateObject(this.bank.id),
@@ -156,7 +156,7 @@ export default {
 
   computed: {
     formTitle () {
-      return this.editedId ? 'Edit Item' : 'New Item'
+      return this.editedId ? this.$t('edit-item') : this.$t('new-item')
     }
   },
 

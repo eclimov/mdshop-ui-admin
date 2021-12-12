@@ -18,7 +18,7 @@
             large
             v-bind="attrs"
             class="mr-2"
-            title="New Item"
+            :title="$t('new-item')"
             v-on="on"
           >
             <span class="material-icons">
@@ -28,7 +28,7 @@
         </template>
         <v-card>
           <v-card-title>
-            <span class="text-h5">New Item</span>
+            <span class="text-h5">{{ $t('new-item') }}</span>
           </v-card-title>
 
           <v-card-text>
@@ -45,14 +45,14 @@
               text
               @click="close"
             >
-              Cancel
+              {{ $t('cancel') }}
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="save"
             >
-              Save
+              {{ $t('save') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -61,7 +61,7 @@
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        label="Search"
+        :label="$t('search')"
         single-line
         hide-details
       />
@@ -74,7 +74,7 @@
       :items="items"
       class="elevation-1"
       :loading="isLoading"
-      loading-text="Loading... Please wait"
+      :loading-text="$t('loading-text')"
       :search="search"
       hide-default-footer
     >
@@ -129,8 +129,8 @@ export default {
           value: 'id'
         },
         { text: 'Email', value: 'email' },
-        { text: 'Created At', sortable: false, value: 'created_at' },
-        { text: 'Actions', value: 'actions', sortable: false }
+        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
+        { text: this.$t('actions'), value: 'actions', sortable: false }
       ],
       items: [],
       editedItem: getUserObject()

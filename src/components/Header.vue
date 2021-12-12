@@ -7,7 +7,7 @@
     <div class="d-flex align-center">
       <router-link :to="{ name: 'home' }">
         <v-img
-          alt="Logo"
+          :alt="$t('logo')"
           class="shrink mr-2"
           contain
           src="@/assets/logo.png"
@@ -22,21 +22,21 @@
         text
         :to="{ name: 'invoices' }"
       >
-        Invoices
+        {{ $t('invoices') }}
       </v-btn>
 
       <v-btn
         text
         :to="{ name: 'companies' }"
       >
-        Companies
+        {{ $t('companies') }}
       </v-btn>
 
       <v-btn
         text
         :to="{ name: 'banks' }"
       >
-        Banks
+        {{ $t('banks') }}
       </v-btn>
 
       <!--No need to display the following link to users-->
@@ -62,7 +62,7 @@
       <v-btn
         class="ml-2"
         icon
-        title="Logout"
+        :title="$t('logout')"
         color="warning"
         @click="logout"
       >
@@ -72,7 +72,7 @@
     <v-btn
       v-else
       icon
-      title="Login"
+      :title="$t('login')"
       :to="{ name: 'login' }"
     >
       <v-icon>mdi-login</v-icon>

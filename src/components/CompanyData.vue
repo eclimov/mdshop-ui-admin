@@ -13,7 +13,7 @@
             icon
             v-bind="attrs"
             class="mr-2"
-            title="Edit Item"
+            :title="$t('edit-item')"
             v-on="on"
           >
             <v-icon>mdi-pencil</v-icon>
@@ -21,7 +21,7 @@
         </template>
         <v-card>
           <v-card-title>
-            <span class="text-h5">Edit Item</span>
+            <span class="text-h5">{{ $t('edit-item') }}</span>
           </v-card-title>
 
           <v-card-text>
@@ -37,14 +37,14 @@
               text
               @click="closeDialog"
             >
-              Cancel
+              {{ $t('cancel') }}
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="save"
             >
-              Save
+              {{ $t('save') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -60,7 +60,7 @@
         large
         icon
         class="mr-2"
-        title="Delete Item"
+        :title="$t('delete-item')"
         @click="isModalDeleteActive = true"
       >
         <v-icon>mdi-delete</v-icon>
@@ -68,13 +68,13 @@
       <h1>{{ company.name }}</h1>
     </v-card-title>
 
-    <v-card-subtitle>Created At: {{ $options.datetimeFormat(company.created_at) }}</v-card-subtitle>
+    <v-card-subtitle>{{ $t('created-at') }}: {{ $options.datetimeFormat(company.created_at) }}</v-card-subtitle>
     <v-card-text>
-      <b>Short Name:</b> {{ company.shortName }}
+      <b>{{ $t('name-short') }}:</b> {{ company.shortName }}
       <br>
-      <b>Affiliate Number:</b> <span v-if="company.bankAffiliate">{{ company.bankAffiliate.affiliateNumber }}</span>
+      <b>{{ $t('affiliate-number') }}:</b> <span v-if="company.bankAffiliate">{{ company.bankAffiliate.affiliateNumber }}</span>
       <br>
-      <b>Fiscal Code:</b> {{ company.fiscalCode }}
+      <b>{{ $t('fiscal-code') }}:</b> {{ company.fiscalCode }}
       <br>
       <b>IBAN:</b> {{ company.iban }}
       <br>
@@ -87,14 +87,13 @@
         dark
         large
         class="mr-2"
-        title="Create Invoice"
         :to="{ name: 'create-invoice', params: { buyerCompanyId: company.id }}"
       >
         <span class="material-icons">
           note_add
         </span>
         &nbsp;
-        Create Invoice
+        {{ $t('create-invoice') }}
       </v-btn>
     </v-card-actions>
   </v-card>

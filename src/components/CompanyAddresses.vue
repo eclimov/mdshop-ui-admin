@@ -6,7 +6,7 @@
       @confirm="deleteItemConfirm(editedId)"
     />
 
-    <v-card-title>Company Addresses</v-card-title>
+    <v-card-title>{{ $t('company-addresses') }}</v-card-title>
 
     <v-card-title>
       <v-dialog
@@ -20,7 +20,7 @@
             large
             v-bind="attrs"
             class="mr-2"
-            title="New Item"
+            :title="$t('new-item')"
             v-on="on"
           >
             <span class="material-icons">
@@ -36,18 +36,18 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="9">
+                <v-col cols="8">
                   <v-text-field
                     v-model="editedItem.address"
                     autofocus
-                    label="Company Address"
+                    :label="$t('company-address')"
                   />
                 </v-col>
 
-                <v-col cols="3">
+                <v-col cols="4">
                   <v-checkbox
                     v-model="editedItem.juridic"
-                    label="Juridic"
+                    :label="$t('juridic')"
                   />
                 </v-col>
               </v-row>
@@ -61,14 +61,14 @@
               text
               @click="close"
             >
-              Cancel
+              {{ $t('cancel') }}
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="save"
             >
-              Save
+              {{ $t('save') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -77,7 +77,7 @@
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        label="Search"
+        :label="$t('search')"
         single-line
         hide-details
       />
@@ -90,7 +90,7 @@
       :items="items"
       class="elevation-1"
       :loading="isLoading"
-      loading-text="Loading... Please wait"
+      :loading-text="$t('loading-text')"
       :search="search"
       hide-default-footer
     >
@@ -156,10 +156,10 @@ export default {
           align: 'start',
           value: 'id'
         },
-        { text: 'Address', value: 'address' },
-        { text: 'Is Juridic', value: 'juridic' },
-        { text: 'Created At', sortable: false, value: 'created_at' },
-        { text: 'Actions', value: 'actions', sortable: false }
+        { text: this.$t('address'), value: 'address' },
+        { text: this.$t('is-juridic'), value: 'juridic' },
+        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
+        { text: this.$t('actions'), value: 'actions', sortable: false }
       ],
       items: [],
       editedItem: getCompanyAddressObject(this.company.id),
@@ -169,7 +169,7 @@ export default {
 
   computed: {
     formTitle () {
-      return this.editedId ? 'Edit Item' : 'New Item'
+      return this.editedId ? this.$t('edit-item') : this.$t('new-item')
     }
   },
 

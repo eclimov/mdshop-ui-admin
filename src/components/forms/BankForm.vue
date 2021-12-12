@@ -7,7 +7,7 @@
         <v-text-field
           v-model="itemEdited.name"
           autofocus
-          label="Name"
+          :label="$t('name')"
         />
       </v-col>
     </v-row>

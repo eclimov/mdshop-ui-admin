@@ -13,12 +13,18 @@
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
           Artprezent
+
+          <v-btn
+            icon
+            :title="$t('location')"
+            @click="redirectToLocation"
+          >
+            <v-icon>location_on</v-icon>
+          </v-btn>
         </h1>
 
         <p class="subheading font-weight-regular">
-          For help and collaboration,
-          <br>please contact
-          <a href="mailto:klimovedik88@gmail.com"> Eduard Climov</a>
+          {{ $t('for-all-questions-contact') }} <b>Eduard Climov</b>
         </p>
       </v-col>
     </v-row>
@@ -30,6 +36,12 @@
 export default {
   name: 'Home',
 
-  components: {}
+  components: {},
+
+  methods: {
+    redirectToLocation () {
+      window.open('https://goo.gl/maps/Ca6rMzR8Ko26bHBN8', '_blank')
+    }
+  }
 }
 </script>

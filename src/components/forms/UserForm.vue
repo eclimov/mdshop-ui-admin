@@ -18,7 +18,7 @@
           :items="companiesOptions"
           item-text="text"
           item-value="value"
-          label="Company"
+          :label="$t('company')"
         />
       </v-col>
     </v-row>
@@ -29,7 +29,7 @@
       >
         <v-text-field
           v-model="itemEdited.password"
-          label="Password (leave empty to not to change)"
+          :label="$t('password-leave-empty-to-not-to-change')"
           :append-icon="isPasswordValueShown ? 'mdi-eye-off' : 'mdi-eye'"
           :type="isPasswordValueShown ? 'text' : 'password'"
           counter
@@ -77,7 +77,7 @@ export default {
     }
     const companies = (await getCompanies()).data
     this.companiesOptions = [
-      { text: '--Select an option--', value: null },
+      { text: this.$t('select-an-option'), value: null },
       ...companies.map((company) => {
         return { text: company.name, value: generateCompanyPath(company.id) }
       })

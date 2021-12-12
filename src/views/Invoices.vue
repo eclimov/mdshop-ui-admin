@@ -10,7 +10,7 @@
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        label="Search"
+        :label="$t('search')"
         single-line
         hide-details
       />
@@ -25,7 +25,7 @@
       :items="items"
       class="elevation-1"
       :loading="isLoading"
-      loading-text="Loading... Please wait"
+      :loading-text="$t('loading-text')"
       :search="search"
       hide-default-footer
     >
@@ -48,7 +48,7 @@
       <template v-slot:item.actions="{ item }">
         <v-icon
           color="secondary"
-          title="Download"
+          :title="$t('download')"
           @click="download(item.id)"
         >
           mdi-download
@@ -90,9 +90,9 @@ export default {
           align: 'start',
           value: 'id'
         },
-        { text: 'Buyer', value: 'buyer.name' },
-        { text: 'Created At', sortable: false, value: 'created_at' },
-        { text: 'Actions', value: 'actions', sortable: false }
+        { text: this.$t('buyer'), value: 'buyer.name' },
+        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
+        { text: this.$t('actions'), value: 'actions', sortable: false }
       ],
       items: []
     }

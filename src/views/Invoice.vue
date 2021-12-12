@@ -2,29 +2,29 @@
   <div>
     <v-card v-if="invoice">
       <v-card-title>
-        <h1>Invoice #{{ invoice.id }}</h1>
+        <h1>{{ $t('invoice') }} #{{ invoice.id }}</h1>
       </v-card-title>
 
-      <v-card-subtitle>Created At: {{ $options.datetimeFormat(invoice.created_at) }}</v-card-subtitle>
+      <v-card-subtitle>{{ $t('created-at') }}: {{ $options.datetimeFormat(invoice.created_at) }}</v-card-subtitle>
       <v-card-text>
-        <b>Seller:</b>
+        <b>{{ $t('seller') }}:</b>
         <router-link :to="{ name: 'company', params: { id: invoice.seller.id } }">
           {{ invoice.seller.name }}
         </router-link>
         <br>
-        <b>Buyer:</b>
+        <b>{{ $t('buyer') }}:</b>
         <router-link :to="{ name: 'company', params: { id: invoice.buyer.id } }">
           {{ invoice.buyer.name }}
         </router-link>
         <br>
-        <b>Processed By:</b> {{ invoice.processedByEmployee.name }}
+        <b>{{ $t('processed-by-employee') }}:</b> {{ invoice.processedByEmployee.name }}
       </v-card-text>
 
       <v-card-actions>
         <v-icon
           color="secondary"
           large
-          title="Download"
+          :title="$t('download')"
           @click="download"
         >
           mdi-download

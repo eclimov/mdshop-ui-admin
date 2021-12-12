@@ -15,7 +15,7 @@
                 :items="sellerOptions"
                 item-text="text"
                 item-value="value"
-                label="Seller"
+                :label="$t('seller')"
                 disabled
               />
             </v-col>
@@ -25,7 +25,7 @@
                 :items="buyerOptions"
                 item-text="text"
                 item-value="value"
-                label="Buyer"
+                :label="$t('buyer')"
                 disabled
               />
             </v-col>
@@ -44,7 +44,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     v-model="orderDateFormatted"
-                    label="Order date"
+                    :label="$t('order-date')"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
@@ -71,7 +71,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     v-model="deliveryDateFormatted"
-                    label="Delivery date"
+                    :label="$t('delivery-date')"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
@@ -95,7 +95,7 @@
                 :items="carrierOptions"
                 item-text="text"
                 item-value="value"
-                label="Carrier"
+                :label="$t('carrier')"
               />
             </v-col>
           </v-row>
@@ -104,7 +104,7 @@
             <v-col cols="12">
               <v-text-field
                 v-model="form.attachedDocument"
-                label="Attached Document"
+                :label="$t('attached-document')"
                 required
               />
             </v-col>
@@ -117,7 +117,7 @@
                 :items="loadingPointOptions"
                 item-text="text"
                 item-value="value"
-                label="Loading point"
+                :label="$t('loading-point')"
               />
             </v-col>
             <v-col cols="6">
@@ -126,7 +126,7 @@
                 :items="unloadingPointOptions"
                 item-text="text"
                 item-value="value"
-                label="Unloading point"
+                :label="$t('unloading-point')"
               />
             </v-col>
           </v-row>
@@ -138,7 +138,7 @@
                 :items="approvedByEmployeeOptions"
                 item-text="text"
                 item-value="value"
-                label="Approved by employee"
+                :label="$t('approved-by-employee')"
               />
             </v-col>
             <v-col cols="6">
@@ -147,7 +147,7 @@
                 :items="processedByEmployeeOptions"
                 item-text="text"
                 item-value="value"
-                label="Processed by employee"
+                :label="$t('processed-by-employee')"
               />
             </v-col>
           </v-row>
@@ -156,7 +156,7 @@
             <v-col cols="12">
               <v-text-field
                 v-model="form.recipientName"
-                label="Recipient name"
+                :label="$t('recipient-name')"
                 required
               />
             </v-col>
@@ -168,7 +168,7 @@
             class="mr-4"
             type="submit"
           >
-            Submit
+            {{ $t('create') }}
           </v-btn>
         </v-form>
       </v-col>
@@ -269,19 +269,19 @@ export default {
       const sellerEmployees = (await getCompanyEmployeesByCompanyId(this.userCompanyId)).data
 
       this.sellerOptions = [
-        { text: '--Select an option--', value: null },
+        { text: this.$t('select-an-option'), value: null },
         ...companies.map((company) => {
           return { text: company.name, value: generateCompanyPath(company.id) }
         })
       ]
       this.buyerOptions = [
-        { text: '--Select an option--', value: null },
+        { text: this.$t('select-an-option'), value: null },
         ...companies.map((company) => {
           return { text: company.name, value: generateCompanyPath(company.id) }
         })
       ]
       this.carrierOptions = [
-        { text: '--Select an option--', value: null },
+        { text: this.$t('select-an-option'), value: null },
         ...companies.map((company) => {
           return { text: company.name, value: generateCompanyPath(company.id) }
         })
@@ -293,19 +293,19 @@ export default {
         })
       ]
       this.unloadingPointOptions = [
-        { text: '--Select an option--', value: null },
+        { text: this.$t('select-an-option'), value: null },
         ...buyerAddresses.map((companyAddress) => {
           return { text: companyAddress.address, value: generateCompanyAddressPath(companyAddress.id) }
         })
       ]
       this.approvedByEmployeeOptions = [
-        { text: '--Select an option--', value: null },
+        { text: this.$t('select-an-option'), value: null },
         ...sellerEmployees.map((companyEmployee) => {
           return { text: companyEmployee.name, value: generateCompanyEmployeePath(companyEmployee.id) }
         })
       ]
       this.processedByEmployeeOptions = [
-        { text: '--Select an option--', value: null },
+        { text: this.$t('select-an-option'), value: null },
         ...sellerEmployees.map((companyEmployee) => {
           return { text: companyEmployee.name, value: generateCompanyEmployeePath(companyEmployee.id) }
         })

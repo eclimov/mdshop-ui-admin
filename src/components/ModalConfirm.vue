@@ -6,7 +6,7 @@
     <v-card>
       <v-card-title class="text-h5">
         <slot name="title">
-          Are you sure you want to delete this item?
+          {{ $t('modal-confirm.delete-question') }}
         </slot>
       </v-card-title>
       <v-card-actions>
@@ -16,7 +16,7 @@
           text
           @click="cancel"
         >
-          Cancel
+          {{ $t('cancel') }}
         </v-btn>
         <v-btn
           color="blue darken-1"

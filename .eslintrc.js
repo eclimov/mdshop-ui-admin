@@ -5,7 +5,7 @@ module.exports = {
   },
   parser: 'vue-eslint-parser',
   parserOptions: {
-    "ecmaVersion": 2020
+    ecmaVersion: 2020
   },
   extends: [
     'standard',
