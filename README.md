@@ -7,3 +7,5 @@ https://stackoverflow.com/questions/51588009/vue-js-configuring-webstorm-to-set-
 ### Design
 [Color palette](https://www.color-hex.com/color-palette/78470)  
 [Icons](https://fonts.google.com/icons?selected=Material+Icons)
+### Internationalization
+[vue-i18n](https://www.codeandweb.com/babeledit/tutorials/how-to-translate-your-vue-app-with-vue-i18n)
