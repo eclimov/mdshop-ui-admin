@@ -301,13 +301,19 @@ export default {
       this.approvedByEmployeeOptions = [
         { text: this.$t('select-an-option'), value: null },
         ...sellerEmployees.map((companyEmployee) => {
-          return { text: companyEmployee.name, value: generateCompanyEmployeePath(companyEmployee.id) }
+          return {
+            text: `[${companyEmployee.position}] ${companyEmployee.name}`,
+            value: generateCompanyEmployeePath(companyEmployee.id)
+          }
         })
       ]
       this.processedByEmployeeOptions = [
         { text: this.$t('select-an-option'), value: null },
         ...sellerEmployees.map((companyEmployee) => {
-          return { text: companyEmployee.name, value: generateCompanyEmployeePath(companyEmployee.id) }
+          return {
+            text: `[${companyEmployee.position}] ${companyEmployee.name}`,
+            value: generateCompanyEmployeePath(companyEmployee.id)
+          }
         })
       ]
 

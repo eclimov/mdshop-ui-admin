@@ -78,7 +78,7 @@
       <br>
       <b>IBAN:</b> {{ company.iban }}
       <br>
-      <b>Vat:</b> {{ company.vat }}
+      <b>{{ $t('vat') }}:</b> {{ company.vat }}
     </v-card-text>
 
     <v-card-actions>

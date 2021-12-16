@@ -139,7 +139,7 @@ export default {
         { text: this.$t('name-short'), value: 'shortName' },
         { text: 'IBAN', value: 'iban' },
         { text: this.$t('fiscal-code'), value: 'fiscalCode' },
-        { text: 'VAT', value: 'vat' },
+        { text: this.$t('vat'), value: 'vat' },
         { text: this.$t('created-at'), sortable: false, value: 'created_at' },
         { text: this.$t('actions'), value: 'actions', sortable: false }
       ],

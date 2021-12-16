@@ -40,7 +40,7 @@
       <v-col cols="6">
         <v-text-field
           v-model="itemEdited.vat"
-          label="VAT"
+          :label="$t('vat')"
         />
       </v-col>
     </v-row>
