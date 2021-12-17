@@ -220,7 +220,7 @@ export default {
         orderDate: (new Date(Date.now())).toISOString().substr(0, 10),
         deliveryDate: (new Date(Date.now())).toISOString().substr(0, 10),
         carrier: null,
-        attachedDocument: '',
+        attachedDocument: '-',
         loadingPoint: null,
         unloadingPoint: null,
         approvedByEmployee: null,
@@ -322,7 +322,7 @@ export default {
       this.form.carrier = generateCompanyPath(this.buyerCompanyId)
 
       if (sellerAddresses.length) {
-        const loadingPointAddressToSelectByDefault = sellerAddresses.find((companyAddress) => companyAddress.juridic) || sellerAddresses[0]
+        const loadingPointAddressToSelectByDefault = sellerAddresses.find((companyAddress) => !companyAddress.juridic) || sellerAddresses[0]
         this.form.loadingPoint = generateCompanyAddressPath(loadingPointAddressToSelectByDefault.id)
       }
       if (buyerAddresses.length) {
