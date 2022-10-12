@@ -124,6 +124,7 @@
               <v-select
                 v-model="form.unloadingPoint"
                 :items="unloadingPointOptions"
+                :rules="unloadingPointRules"
                 item-text="text"
                 item-value="value"
                 :label="$t('unloading-point')"
@@ -226,7 +227,10 @@ export default {
         approvedByEmployee: null,
         processedByEmployee: null,
         recipientName: ''
-      }
+      },
+      unloadingPointRules: [
+        v => !!v || this.$t('validation.required')
+      ]
       // emailRules: [
       //   v => !!v || 'E-mail is required',
       //   v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
