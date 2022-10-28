@@ -57,7 +57,11 @@
         <router-link :to="{ name: 'user', params: { id: userId } }">
           {{ userEmail }}
         </router-link>
-        <span class="text-caption">{{ userCompanyName }}</span>
+        <span class="text-caption">
+          <router-link :to="{ name: 'company', params: { id: userCompanyId } }">
+            {{ userCompanyName }}
+          </router-link>
+        </span>
       </div>
       <v-btn
         class="ml-2"
@@ -89,6 +93,7 @@ export default {
   computed: {
     ...mapGetters({
       userId: 'user/id',
+      userCompanyId: 'user/companyId',
       userCompanyName: 'user/companyName',
       userEmail: 'user/email'
     }),
