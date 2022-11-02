@@ -1,5 +1,14 @@
 <template>
   <v-container>
+    <v-row v-if="isExistingCompany">
+      <v-col cols="12">
+        <CompanyLogoUploadForm
+          :file-name="itemEdited.logo"
+          :company-id="itemEdited.id"
+        />
+      </v-col>
+    </v-row>
+
     <v-row>
       <v-col cols="8">
         <v-text-field
@@ -65,10 +74,11 @@
 
 <script>
 import { API_PATH_BANK_AFFILIATES, getBankAffiliates } from '@/api/bankAffiliates'
+import CompanyLogoUploadForm from './CompanyLogoUploadForm'
 
 export default {
   name: 'CompanyForm',
-
+  components: { CompanyLogoUploadForm },
   props: {
     value: {
       type: Object,
@@ -81,6 +91,12 @@ export default {
       isBankAffiliatesLoading: false,
       bankAffiliatesOptions: [],
       itemEdited: null
+    }
+  },
+
+  computed: {
+    isExistingCompany () {
+      return !!this.itemEdited.id
     }
   },
 
@@ -102,7 +118,7 @@ export default {
       this.bankAffiliatesOptions = bankAffiliates
         .map((bankAffiliate) => this.formatBankAffiliateSelectOption(bankAffiliate))
 
-      if (this.itemEdited.id) { // If editing existing item
+      if (this.isExistingCompany) {
         if (this.itemEdited.bankAffiliate) {
           this.itemEdited.bankAffiliate = this.formatBankAffiliateSelectOption(this.itemEdited.bankAffiliate).value
         } else {
