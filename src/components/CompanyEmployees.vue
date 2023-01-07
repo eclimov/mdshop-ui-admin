@@ -28,51 +28,14 @@
             </span>
           </v-btn>
         </template>
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title>
-
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="8">
-                  <v-text-field
-                    v-model="editedItem.name"
-                    autofocus
-                    :label="$t('employee-name')"
-                  />
-                </v-col>
-
-                <v-col cols="4">
-                  <v-select
-                    v-model="editedItem.position"
-                    :items="positions"
-                    :label="$t('position')"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="close"
-            >
-              {{ $t('cancel') }}
-            </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="save"
-            >
-              {{ $t('save') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <!--v-if="dialog" destroys the component on close-->
+        <CompanyEmployeeForm
+          v-if="dialog"
+          :company-id="company.id"
+          :company-employee-id="editedId"
+          @cancel="modalClose"
+          @ok="modalOk"
+        />
       </v-dialog>
 
       <v-text-field
@@ -123,14 +86,13 @@
 <script>
 import ModalConfirm from '@/components/ModalConfirm'
 import { datetimeFormat } from '@/utils/string'
-import { getCompanyEmployeeObject } from '@/utils/forms'
 import { getCompanyEmployeesByCompanyId } from '@/api/companies'
-import { createCompanyEmployee, deleteCompanyEmployee, updateCompanyEmployee } from '@/api/companyEmployees'
-import { positionsEnum } from '@/utils/enums'
+import { deleteCompanyEmployee } from '@/api/companyEmployees'
+import CompanyEmployeeForm from '@/components/forms/CompanyEmployeeForm'
 
 export default {
   name: 'CompanyEmployees',
-  components: { ModalConfirm },
+  components: { CompanyEmployeeForm, ModalConfirm },
   datetimeFormat,
   props: {
     company: {
@@ -146,10 +108,6 @@ export default {
       dialog: false,
       editedId: 0,
       search: '',
-      positions: [
-        positionsEnum.CONSULTANT,
-        positionsEnum.DIRECTOR
-      ],
       headers: [
         {
           text: 'ID',
@@ -161,21 +119,19 @@ export default {
         { text: this.$t('created-at'), sortable: false, value: 'created_at' },
         { text: this.$t('actions'), value: 'actions', sortable: false }
       ],
-      items: [],
-      editedItem: getCompanyEmployeeObject(this.company.id),
-      defaultItem: getCompanyEmployeeObject(this.company.id)
-    }
-  },
-
-  computed: {
-    formTitle () {
-      return this.editedId ? this.$t('edit-item') : this.$t('new-item')
+      employeeNameRules: [
+        v => !!v || this.$t('validation.required')
+      ],
+      employeePositionRules: [
+        v => !!v || this.$t('validation.required')
+      ],
+      items: []
     }
   },
 
   watch: {
     dialog (val) {
-      val || this.close()
+      val || this.modalClose()
     }
   },
 
@@ -193,28 +149,8 @@ export default {
       }
     },
 
-    async save () {
-      const editedId = this.editedId
-      const editedItem = this.editedItem
-
-      this.close()
-
-      try {
-        this.isLoading = true
-        if (editedId) {
-          await updateCompanyEmployee(editedId, editedItem)
-        } else {
-          await createCompanyEmployee(editedItem)
-        }
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
     editItem (item) {
       this.editedId = item.id
-      this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
@@ -234,10 +170,14 @@ export default {
       }
     },
 
-    close () {
+    modalClose () {
       this.dialog = false
-      this.editedItem = Object.assign({}, this.defaultItem)
       this.resetEditedId()
+    },
+
+    modalOk () {
+      this.fetch()
+      this.modalClose()
     },
 
     resetEditedId () {
