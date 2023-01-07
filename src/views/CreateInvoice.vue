@@ -155,10 +155,9 @@
 
           <v-row>
             <v-col cols="12">
-              <v-text-field
+              <InvoiceRecipientInput
                 v-model="form.recipientName"
-                :label="$t('recipient-name')"
-                required
+                :company-id="buyerCompanyId"
               />
             </v-col>
           </v-row>
@@ -190,11 +189,12 @@ import { dateFormat } from '@/utils/string'
 import { createInvoice } from '@/api/invoices'
 import { generateCompanyAddressPath } from '@/api/companyAddresses'
 import { generateCompanyEmployeePath } from '@/api/companyEmployees'
+import InvoiceRecipientInput from '@/components/forms/InvoiceRecipientInput'
 
 // TODO: implement 'add item' feature via 'append-icon' of form input
 export default {
   name: 'CreateInvoice',
-  components: {},
+  components: { InvoiceRecipientInput },
 
   props: {
     buyerCompanyId: {
@@ -341,7 +341,20 @@ export default {
       }
     },
 
+    sleep (milliseconds) {
+      return new Promise((resolve) => setTimeout(resolve, milliseconds))
+    },
+
     async submit () {
+      try {
+        this.showLoadingOverlay()
+        // We need to sleep, to make sure the form's value doesn't get lost after instant [Submit] click
+        // Test case: fill recipient name and click [Submit] button right after. See results sent to the server
+        await this.sleep(500)
+      } finally {
+        this.hideLoadingOverlay()
+      }
+
       if (this.$refs.form.validate()) {
         this.showLoadingOverlay()
         try {

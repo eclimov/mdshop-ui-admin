@@ -57,5 +57,8 @@
   "validation": {
     "required": "This field is required",
     "invalid": "Invalid value"
+  },
+  "hints": {
+    "invoice-create-recipient-input": "Choose a value from existing list (buyer company employees) or enter a different one"
   }
 }
