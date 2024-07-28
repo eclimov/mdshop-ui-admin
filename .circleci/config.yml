@@ -23,7 +23,7 @@ jobs:
 
   deploy:
     docker:
-      - image: docker:18.05.0-ce-git
+      - image: cimg/base:stable
     parallelism: 1
     working_directory: ~/eclimov/mdshop-ui-admin
     steps:
