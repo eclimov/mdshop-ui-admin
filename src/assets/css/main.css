@@ -1,0 +1,16 @@
+.v-table {
+  --v-table-row-height: 25px;
+}
+
+.v-data-table-header__content {
+  font-weight: bold;
+}
+
+/*Striped rows*/
+tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, .02);
+}
+
+a {
+  color: #1976d2;
+}

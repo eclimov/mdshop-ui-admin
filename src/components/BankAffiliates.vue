@@ -1,240 +1,194 @@
-<template>
-  <v-card>
-    <ModalConfirm
-      v-if="isModalDeleteActive"
-      @cancel="resetEditedId"
-      @confirm="deleteItemConfirm(editedId)"
-    />
-
-    <v-card-title>{{ $t('bank-affiliates') }}</v-card-title>
-
-    <v-card-title>
-      <v-dialog
-        v-model="dialog"
-        max-width="500px"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="success"
-            dark
-            large
-            v-bind="attrs"
-            class="mr-2"
-            :title="$t('new-item')"
-            v-on="on"
-          >
-            <span class="material-icons">
-              add_box
-            </span>
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title>
-
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="editedItem.affiliateNumber"
-                    autofocus
-                    :label="$t('affiliate-number')"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="close"
-            >
-              {{ $t('cancel') }}
-            </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="save"
-            >
-              {{ $t('save') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        :label="$t('search')"
-        single-line
-        hide-details
-      />
-    </v-card-title>
-
-    <v-data-table
-      dense
-      :items-per-page="items.length"
-      :headers="headers"
-      :items="items"
-      class="elevation-1"
-      :loading="isLoading"
-      :loading-text="$t('loading-text')"
-      :search="search"
-      hide-default-footer
-    >
-      <template v-slot:item.created_at="{ item }">
-        {{ $options.datetimeFormat(item.created_at) }}
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          color="warning"
-          @click="editItem(item)"
-        >
-          mdi-pencil
-        </v-icon>
-        <v-icon
-          small
-          color="error"
-          @click="deleteItem(item)"
-        >
-          mdi-delete
-        </v-icon>
-      </template>
-    </v-data-table>
-  </v-card>
-</template>
-
-<script>
-import ModalConfirm from '@/components/ModalConfirm'
-import { createBankAffiliate, deleteBankAffiliate, getBankAffiliatesByBankId, updateBankAffiliate } from '@/api/bankAffiliates'
+<script setup lang="ts">
+import {
+  deleteBankAffiliate,
+  getBankAffiliatesByBankId,
+} from '@/api/bankAffiliates'
 import { datetimeFormat } from '@/utils/string'
-import { getBankAffiliateObject } from '@/utils/forms'
+import { getEmptyBankAffiliateView } from '@/utils/forms'
+import type { BankTypeView } from '@/types/bank'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import BankAffiliateForm from '@/components/forms/BankAffiliateForm.vue'
+import type { BankAffiliateTypeView } from '@/types/bankAffiliate'
+import ModalConfirm from '@/components/ModalConfirm.vue'
 
-export default {
-  name: 'BankAffiliates',
-  components: { ModalConfirm },
-  datetimeFormat,
-  props: {
-    bank: {
-      type: Object,
-      required: true
-    }
+const props = defineProps<{
+  bank: BankTypeView;
+}>()
+
+const { t } = useI18n()
+const isLoading = ref(false)
+const isModalDeleteActive = ref(false)
+const dialog = ref(false)
+const editedItem = ref(getEmptyBankAffiliateView())
+const search = ref('')
+const headers = ref([
+  {
+    title: 'ID',
+    align: 'start',
+    value: 'id',
+    sortable: true
   },
+  { title: t('affiliate-number'), value: 'affiliateNumber', sortable: true },
+  { title: t('created-at'), value: 'created_at' },
+  { title: t('actions'), value: 'actions' }
+] as const)
+const items = ref([])
 
-  data () {
-    return {
-      isLoading: false,
-      isModalDeleteActive: false,
-      dialog: false,
-      editedId: 0,
-      search: '',
-      headers: [
-        {
-          text: 'ID',
-          align: 'start',
-          value: 'id'
-        },
-        { text: this.$t('affiliate-number'), value: 'affiliateNumber' },
-        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
-        { text: this.$t('actions'), value: 'actions', sortable: false }
-      ],
-      items: [],
-      editedItem: getBankAffiliateObject(this.bank.id),
-      defaultItem: getBankAffiliateObject(this.bank.id)
-    }
-  },
+function onSaved () {
+  closeDialogEdit()
+  fetch()
+}
 
-  computed: {
-    formTitle () {
-      return this.editedId ? this.$t('edit-item') : this.$t('new-item')
-    }
-  },
+function editItem (item: BankAffiliateTypeView) {
+  editedItem.value = { ...item }
+  dialog.value = true
+}
 
-  watch: {
-    dialog (val) {
-      val || this.close()
-    }
-  },
+function deleteItem (item: BankAffiliateTypeView) {
+  editedItem.value = { ...item }
+  isModalDeleteActive.value = true
+}
 
-  async created () {
-    await this.fetch()
-  },
+function resetEditedItem () {
+  editedItem.value = getEmptyBankAffiliateView()
+}
 
-  methods: {
-    async fetch () {
-      this.isLoading = true
-      try {
-        this.items = (await getBankAffiliatesByBankId(this.bank.id)).data
-      } finally {
-        this.isLoading = false
-      }
-    },
+function closeDialogDelete () {
+  isModalDeleteActive.value = false
+  resetEditedItem()
+}
 
-    async save () {
-      const editedId = this.editedId
-      const editedItem = this.editedItem
+function closeDialogEdit () {
+  dialog.value = false
+}
 
-      this.close()
-
-      try {
-        this.isLoading = true
-        if (editedId) {
-          await updateBankAffiliate(editedId, editedItem)
-        } else {
-          await createBankAffiliate(editedItem)
-        }
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    editItem (item) {
-      this.editedId = item.id
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
-    },
-
-    deleteItem (item) {
-      this.editedId = item.id
-      this.isModalDeleteActive = true
-    },
-
-    async deleteItemConfirm (id) {
-      this.resetEditedId()
-      this.isLoading = true
-      try {
-        await deleteBankAffiliate(id)
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    close () {
-      this.dialog = false
-      this.editedItem = Object.assign({}, this.defaultItem)
-      this.resetEditedId()
-    },
-
-    resetEditedId () {
-      this.editedId = 0
-      this.isModalDeleteActive = false
-    }
+async function deleteItemConfirm (id: number) {
+  closeDialogDelete()
+  isLoading.value = true
+  try {
+    await deleteBankAffiliate(id)
+  } finally {
+    await fetch()
+    isLoading.value = false
   }
 }
+
+async function fetch () {
+  isLoading.value = true
+  try {
+    items.value = (await getBankAffiliatesByBankId(props.bank.id)).data
+  } finally {
+    isLoading.value = false
+  }
+}
+
+fetch()
 </script>
 
-<style scoped>
 
-</style>
+<template>
+  <v-dialog
+    v-model="dialog"
+    max-width="500px"
+    @after-leave="resetEditedItem"
+  >
+    <BankAffiliateForm
+      v-model:bank-affiliate="editedItem"
+      @cancel="closeDialogEdit"
+      @saved="onSaved"
+    />
+  </v-dialog>
+
+  <ModalConfirm
+    v-if="isModalDeleteActive"
+    :object-value="editedItem.affiliateNumber"
+    @cancel="closeDialogDelete"
+    @confirm="deleteItemConfirm(editedItem.id)"
+  />
+
+  <v-container>
+    <v-row>
+      <v-col class="text-h5">
+        {{ $t('bank-affiliates') }}
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col
+        class="d-flex align-center"
+        cols="12"
+      >
+        <v-btn
+          class="mr-4"
+          color="success"
+          rounded="md"
+          :title="$t('new-item')"
+          @click="dialog = true"
+        >
+          <v-icon size="large">
+            mdi-plus-box
+          </v-icon>
+        </v-btn>
+
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          class="flex-grow-1"
+          hide-details
+          :label="$t('search')"
+          single-line
+          variant="underlined"
+        />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <v-data-table
+          class="elevation-1"
+          density="compact"
+          :headers="headers"
+          hide-default-footer
+          hover
+          :items="items"
+          :items-per-page="items.length"
+          :loading="isLoading"
+          :loading-text="$t('loading-text')"
+          :search="search"
+        >
+          <template #loader>
+            <v-progress-linear
+              color="primary"
+              indeterminate
+            />
+          </template>
+
+          <template #no-data>
+            {{ $t('data-table.no-data') }}
+          </template>
+
+          <template #[`item.created_at`]="{ value }">
+            {{ datetimeFormat(value) }}
+          </template>
+
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              class="mr-2"
+              color="warning"
+              icon="mdi-pencil"
+              size="small"
+              @click="editItem(item)"
+            />
+            &nbsp;
+            <v-icon
+              color="error"
+              icon="mdi-delete"
+              size="small"
+              @click="deleteItem(item)"
+            />
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+

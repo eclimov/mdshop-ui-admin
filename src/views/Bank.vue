@@ -1,63 +1,44 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { getEmptyBankView } from '@/utils/forms'
+import { findBank } from '@/api/banks'
+import { useLoader } from '@/stores/loader'
+import BankData from '@/components/BankData.vue'
+import BankAffiliates from '@/components/BankAffiliates.vue'
+
+const props = defineProps<{
+  id: string;
+}>()
+
+const loaderStore = useLoader()
+const bank = ref(getEmptyBankView())
+
+async function fetch () {
+  loaderStore.isActive = true
+  try {
+    bank.value = (await findBank(props.id)).data
+  } finally {
+    loaderStore.isActive = false
+  }
+}
+
+fetch()
+</script>
+
 <template>
   <div>
     <BankData
-      v-if="bank"
+      v-if="bank.id"
       :bank="bank"
-      @updated="fetch"
+      @deleted="$router.push({ name: 'banks' })"
+      @saved="fetch"
     />
-    <hr>
+
+    <hr />
+
     <BankAffiliates
-      v-if="bank"
+      v-if="bank.id"
       :bank="bank"
     />
   </div>
 </template>
-
-<script>
-
-import { findBank } from '@/api/banks'
-import { mapActions } from 'vuex'
-import BankData from '@/components/BankData'
-import BankAffiliates from '@/components/BankAffiliates'
-
-export default {
-  name: 'Bank',
-  components: { BankAffiliates, BankData },
-  props: {
-    id: {
-      type: [Number, String],
-      required: true
-    }
-  },
-
-  data () {
-    return {
-      bank: null
-    }
-  },
-
-  created () {
-    this.fetch()
-  },
-
-  methods: {
-    ...mapActions({
-      showLoadingOverlay: 'general/showLoadingOverlay',
-      hideLoadingOverlay: 'general/hideLoadingOverlay'
-    }),
-
-    async fetch () {
-      this.showLoadingOverlay()
-      try {
-        this.bank = (await findBank(this.id)).data
-      } finally {
-        this.hideLoadingOverlay()
-      }
-    }
-  }
-}
-</script>
-
-<style scoped>
-
-</style>

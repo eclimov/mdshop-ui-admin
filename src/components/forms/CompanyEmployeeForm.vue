@@ -1,51 +1,85 @@
+<script setup lang="ts">
+import { mapCompanyEmployeeViewToCreate } from '@/utils/forms'
+import { useLoader } from '@/stores/loader'
+import { useRoute } from 'vue-router'
+import type { CompanyEmployeeTypeView } from '@/types/companyEmployee'
+import { createCompanyEmployee, updateCompanyEmployee } from '@/api/companyEmployees'
+import { useI18n } from 'vue-i18n'
+import { positionsEnum } from '@/utils/enums'
+
+const companyEmployee = defineModel<CompanyEmployeeTypeView>('companyEmployee', {
+  required: true
+})
+
+const route = useRoute()
+
+const emit = defineEmits(['cancel', 'saved'])
+const loaderStore = useLoader()
+
+const { t } = useI18n()
+
+const rules = {
+  required: (value: string) => !!value || t('validation.required')
+}
+
+async function save () {
+  try {
+    loaderStore.isActive = true
+    if (companyEmployee.value.id) {
+      await updateCompanyEmployee(companyEmployee.value.id, companyEmployee.value)
+    } else {
+      await createCompanyEmployee(
+        mapCompanyEmployeeViewToCreate(companyEmployee.value, route.params.id as string)  // TODO: update API - allow sending CompanyEmployeeTypeView type directly
+      )
+    }
+    emit('saved')
+  } finally {
+    loaderStore.isActive = false
+  }
+}
+</script>
+
 <template>
-  <v-card
-    :disabled="isLoading"
-    :loading="isLoading"
-  >
+  <v-card>
     <v-card-title>
-      <span class="text-h5">{{ title }}</span>
+      <span class="text-h5">{{ companyEmployee.id ? $t('edit-item') : $t('new-item') }}</span>
     </v-card-title>
 
     <v-card-text>
-      <v-form v-model="isValid">
-        <v-container>
-          <v-row>
-            <v-col cols="8">
-              <v-text-field
-                v-model="editedItem.name"
-                :rules="employeeNameRules"
-                autofocus
-                :label="$t('employee-name')"
-              />
-            </v-col>
+      <v-container>
+        <v-row>
+          <v-col cols="7">
+            <v-text-field
+              v-model="companyEmployee.name"
+              autofocus
+              :label="$t('employee-name')"
+              :rules="[rules.required]"
+              variant="underlined"
+            />
+          </v-col>
 
-            <v-col cols="4">
-              <v-select
-                v-model="editedItem.position"
-                :items="positions"
-                :rules="employeePositionRules"
-                :label="$t('position')"
-              />
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
+          <v-col cols="5">
+            <v-select
+              v-model="companyEmployee.position"
+              :items="[positionsEnum.CONSULTANT, positionsEnum.DIRECTOR]"
+              :label="$t('position')"
+              variant="underlined"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card-text>
 
     <v-card-actions>
       <v-spacer />
       <v-btn
         color="blue darken-1"
-        text
-        @click="$emit('cancel')"
+        @click="emit('cancel')"
       >
         {{ $t('cancel') }}
       </v-btn>
       <v-btn
         color="blue darken-1"
-        text
-        :disabled="!isValid"
         @click="save"
       >
         {{ $t('save') }}
@@ -53,81 +87,3 @@
     </v-card-actions>
   </v-card>
 </template>
-
-<script>
-import { positionsEnum } from '@/utils/enums'
-import { getCompanyEmployeeObject } from '@/utils/forms'
-import { findCompanyEmployee, createCompanyEmployee, updateCompanyEmployee } from '@/api/companyEmployees'
-
-export default {
-  name: 'CompanyEmployeeFormVue',
-
-  props: {
-    companyId: {
-      type: Number,
-      required: true
-    },
-    companyEmployeeId: {
-      type: Number,
-      required: true
-    }
-  },
-
-  data () {
-    return {
-      isLoading: false,
-      positions: [
-        positionsEnum.CONSULTANT,
-        positionsEnum.DIRECTOR
-      ],
-      employeeNameRules: [
-        v => !!v || this.$t('validation.required')
-      ],
-      employeePositionRules: [
-        v => !!v || this.$t('validation.required')
-      ],
-      isValid: false,
-      editedItem: getCompanyEmployeeObject(this.companyId)
-    }
-  },
-
-  computed: {
-    title () {
-      return this.companyEmployeeId ? this.$t('edit-item') : this.$t('new-item')
-    }
-  },
-
-  async created () {
-    if (this.companyEmployeeId) {
-      try {
-        this.isLoading = true
-        this.editedItem = (await findCompanyEmployee(this.companyEmployeeId)).data
-      } finally {
-        this.isLoading = false
-      }
-    }
-  },
-
-  methods: {
-    async save () {
-      const editedItem = this.editedItem
-
-      try {
-        this.isLoading = true
-        if (this.companyEmployeeId) {
-          await updateCompanyEmployee(this.companyEmployeeId, editedItem)
-        } else {
-          await createCompanyEmployee(editedItem)
-        }
-        this.$emit('ok')
-      } finally {
-        this.isLoading = false
-      }
-    }
-  }
-}
-</script>
-
-<style scoped>
-
-</style>

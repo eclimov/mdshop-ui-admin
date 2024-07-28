@@ -1,212 +1,192 @@
-<template>
-  <v-card>
-    <ModalConfirm
-      v-if="isModalDeleteActive"
-      @cancel="resetEditedId"
-      @confirm="deleteItemConfirm(editedId)"
-    />
-
-    <v-card-title>
-      <v-dialog
-        v-model="dialog"
-        max-width="500px"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="success"
-            dark
-            large
-            v-bind="attrs"
-            class="mr-2"
-            :title="$t('new-item')"
-            v-on="on"
-          >
-            <span class="material-icons">
-              add_box
-            </span>
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">{{ $t('new-item') }}</span>
-          </v-card-title>
-
-          <v-card-text>
-            <UserForm
-              :key="editedItem.id"
-              v-model="editedItem"
-            />
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="close"
-            >
-              {{ $t('cancel') }}
-            </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="save"
-            >
-              {{ $t('save') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        :label="$t('search')"
-        single-line
-        hide-details
-      />
-    </v-card-title>
-
-    <v-data-table
-      dense
-      :items-per-page="items.length"
-      :headers="headers"
-      :items="items"
-      class="elevation-1"
-      :loading="isLoading"
-      :loading-text="$t('loading-text')"
-      :search="search"
-      hide-default-footer
-    >
-      <template v-slot:item.email="{ item }">
-        <router-link :to="{ name: 'user', params: { id: item.id } }">
-          {{ item.email }}
-        </router-link>
-      </template>
-
-      <template v-slot:item.created_at="{ item }">
-        {{ $options.datetimeFormat(item.created_at) }}
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          color="error"
-          @click="deleteItem(item)"
-        >
-          mdi-delete
-        </v-icon>
-      </template>
-    </v-data-table>
-  </v-card>
-</template>
-
-<script>
-
+<script setup lang="ts">
 import { datetimeFormat } from '@/utils/string'
-import ModalConfirm from '@/components/ModalConfirm'
-import { getUserObject } from '@/utils/forms'
-import UserForm from '@/components/forms/UserForm'
-import { createUser, deleteUser, getUsers } from '@/api/users'
-import { mapActions, mapGetters } from 'vuex'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import ModalConfirm from '@/components/ModalConfirm.vue'
+import { getEmptyUserView } from '@/utils/forms'
+import { deleteUser, getUsers } from '@/api/users'
+import type { UserTypeView } from '@/types/user'
+import UserForm from '@/components/forms/UserForm.vue'
 
-export default {
-  name: 'Users',
-  datetimeFormat,
-  components: { UserForm, ModalConfirm },
-
-  data () {
-    return {
-      isLoading: false,
-      isModalDeleteActive: false,
-      dialog: false,
-      editedId: 0,
-      search: '',
-      headers: [
-        {
-          text: 'ID',
-          align: 'start',
-          value: 'id'
-        },
-        { text: 'Email', value: 'email' },
-        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
-        { text: this.$t('actions'), value: 'actions', sortable: false }
-      ],
-      items: [],
-      editedItem: getUserObject()
-    }
+const { t } = useI18n()
+const isLoading = ref(false)
+const isModalDeleteActive = ref(false)
+const dialog = ref(false)
+const editedItem = ref(getEmptyUserView())
+const search = ref('')
+const headers = ref([
+  {
+    title: 'ID',
+    align: 'start',
+    value: 'id',
+    sortable: true
   },
+  { title: 'Email', value: 'email', sortable: true },
+  { title: t('company'), value: 'company.name', sortable: true },
+  { title: t('created-at'), value: 'created_at' },
+  { title: t('actions'), value: 'actions' }
+] as const)
+const items = ref([])
 
-  computed: {
-    ...mapGetters({
-      userEmail: 'user/email'
-    })
-  },
-
-  watch: {
-    dialog (val) {
-      val || this.close()
-    }
-  },
-
-  async created () {
-    await this.fetch()
-  },
-
-  methods: {
-    ...mapActions({
-      userLogout: 'user/logout'
-    }),
-
-    async fetch () {
-      this.isLoading = true
-      try {
-        this.items = (await getUsers()).data
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    async save () {
-      const editedItem = this.editedItem
-
-      this.close()
-
-      try {
-        this.isLoading = true
-        await createUser(editedItem)
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    deleteItem (item) {
-      this.editedId = item.id
-      this.isModalDeleteActive = true
-    },
-
-    async deleteItemConfirm (id) {
-      this.resetEditedId()
-      this.isLoading = true
-      try {
-        await deleteUser(id)
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    close () {
-      this.dialog = false
-      this.editedItem = getUserObject()
-      this.resetEditedId()
-    },
-
-    resetEditedId () {
-      this.editedId = 0
-      this.isModalDeleteActive = false
-    }
+async function fetch () {
+  isLoading.value = true
+  try {
+    items.value = (await getUsers()).data
+  } finally {
+    isLoading.value = false
   }
 }
+
+function onSaved () {
+  closeDialogEdit()
+  fetch()
+}
+
+function editItem (item: UserTypeView) {
+  editedItem.value = { ...item }
+  dialog.value = true
+}
+
+function deleteItem (item: UserTypeView) {
+  editedItem.value = { ...item }
+  isModalDeleteActive.value = true
+}
+
+function resetEditedItem () {
+  editedItem.value = getEmptyUserView()
+}
+
+function closeDialogDelete () {
+  isModalDeleteActive.value = false
+  resetEditedItem()
+}
+
+function closeDialogEdit () {
+  dialog.value = false
+}
+
+async function deleteItemConfirm (id: number) {
+  closeDialogDelete()
+  isLoading.value = true
+  try {
+    await deleteUser(id)
+  } finally {
+    await fetch()
+    isLoading.value = false
+  }
+}
+
+fetch()
 </script>
+
+<template>
+  <v-dialog
+    v-model="dialog"
+    max-width="500px"
+    @after-leave="resetEditedItem"
+  >
+    <UserForm
+      v-model:user="editedItem"
+      @cancel="closeDialogEdit"
+      @saved="onSaved"
+    />
+  </v-dialog>
+
+  <ModalConfirm
+    v-if="isModalDeleteActive"
+    :object-value="editedItem.email"
+    @cancel="closeDialogDelete"
+    @confirm="deleteItemConfirm(editedItem.id)"
+  />
+
+  <v-container fluid>
+    <v-row no-gutters>
+      <v-col
+        class="d-flex align-center"
+        cols="12"
+      >
+        <v-btn
+          class="mr-4"
+          color="success"
+          rounded="md"
+          :title="$t('new-item')"
+          @click="dialog = true"
+        >
+          <v-icon size="large">
+            mdi-plus-box
+          </v-icon>
+        </v-btn>
+
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          class="flex-grow-1"
+          hide-details
+          :label="$t('search')"
+          single-line
+          variant="underlined"
+        />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <v-data-table
+          class="elevation-1"
+          density="compact"
+          :headers="headers"
+          hide-default-footer
+          hover
+          :items="items"
+          :items-per-page="items.length"
+          :loading="isLoading"
+          :loading-text="$t('loading-text')"
+          :search="search"
+        >
+          <template #loader>
+            <v-progress-linear
+              color="primary"
+              indeterminate
+            />
+          </template>
+
+          <template #no-data>
+            {{ $t('data-table.no-data') }}
+          </template>
+
+          <template #[`item.email`]="{ item }: any">
+            <router-link :to="{ name: 'user', params: { id: item.id } }">
+              {{ item.email }}
+            </router-link>
+          </template>
+
+          <template #[`item.company.name`]="{ item }: any">
+            <router-link :to="{ name: 'company', params: { id: item.company.id } }">
+              {{ item.company.name }}
+            </router-link>
+          </template>
+
+          <template #[`item.created_at`]="{ value }">
+            {{ datetimeFormat(value) }}
+          </template>
+
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              class="mr-2"
+              color="warning"
+              icon="mdi-pencil"
+              size="small"
+              @click="editItem(item)"
+            />
+            &nbsp;
+            <v-icon
+              color="error"
+              icon="mdi-delete"
+              size="small"
+              @click="deleteItem(item)"
+            />
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>

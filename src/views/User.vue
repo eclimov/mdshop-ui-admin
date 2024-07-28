@@ -1,56 +1,36 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { getEmptyUserView } from '@/utils/forms'
+import { useLoader } from '@/stores/loader'
+import { findUser } from '@/api/users'
+import UserData from '@/components/UserData.vue'
+
+const props = defineProps<{
+  id: string;
+}>()
+
+const loaderStore = useLoader()
+const user = ref(getEmptyUserView())
+
+async function fetch () {
+  loaderStore.isActive = true
+  try {
+    user.value = (await findUser(props.id)).data
+  } finally {
+    loaderStore.isActive = false
+  }
+}
+
+fetch()
+</script>
+
 <template>
   <div>
     <UserData
-      v-if="user"
+      v-if="user.id"
       :user="user"
-      @updated="fetch"
+      @deleted="$router.push({ name: 'users' })"
+      @saved="fetch"
     />
   </div>
 </template>
-
-<script>
-import { mapActions } from 'vuex'
-import UserData from '@/components/UserData'
-import { findUser } from '@/api/users'
-
-export default {
-  name: 'User',
-  components: { UserData },
-  props: {
-    id: {
-      type: [Number, String],
-      required: true
-    }
-  },
-
-  data () {
-    return {
-      user: null
-    }
-  },
-
-  created () {
-    this.fetch()
-  },
-
-  methods: {
-    ...mapActions({
-      showLoadingOverlay: 'general/showLoadingOverlay',
-      hideLoadingOverlay: 'general/hideLoadingOverlay'
-    }),
-
-    async fetch () {
-      this.showLoadingOverlay()
-      try {
-        this.user = (await findUser(this.id)).data
-      } finally {
-        this.hideLoadingOverlay()
-      }
-    }
-  }
-}
-</script>
-
-<style scoped>
-
-</style>

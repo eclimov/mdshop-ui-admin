@@ -5,26 +5,26 @@
         <span title="Logo">
           <v-file-input
             v-model="image"
-            type="file"
-            class="input"
-            label="Logo"
-            hint="jpg, 150x100"
             accept="image/jpeg"
-            outlined
+            class="input"
             dense
+            hint="jpg, 150x100"
+            label="Logo"
+            outlined
             prepend-icon="mdi-file-image"
+            type="file"
             @change="onFileChange"
           />
         </span>
       </v-col>
       <v-col cols="2">
         <v-btn
-          color="primary"
-          large
-          icon
-          :disabled="!image"
-          :loading="isLoading"
           class="mr-2"
+          color="primary"
+          :disabled="!image"
+          icon
+          large
+          :loading="isLoading"
           title="Upload"
           @click="upload"
         >
@@ -35,8 +35,8 @@
 
     <v-row class="mt-0">
       <v-col
-        cols="12"
         class="pt-0"
+        cols="12"
       >
         <v-img
           class="mx-auto"
@@ -48,10 +48,11 @@
   </v-container>
 </template>
 
+<!--TODO: implement or remove this component-->
 <script>
 
-import { uploadLogo } from '../../api/companies'
-import { getCompanyLogoUrl } from '../../utils/files'
+import { uploadLogo } from '@/api/companies.js'
+import { getCompanyLogoUrl } from '@/utils/files.js'
 
 export default {
   name: 'CompanyLogoUploadForm',

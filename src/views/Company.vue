@@ -1,68 +1,50 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { getEmptyCompanyView } from '@/utils/forms'
+import { useLoader } from '@/stores/loader'
+import { findCompany } from '@/api/companies'
+import CompanyData from '@/components/CompanyData.vue'
+import CompanyAddresses from '@/components/CompanyAddresses.vue'
+import CompanyEmployees from '@/components/CompanyEmployees.vue'
+
+const props = defineProps<{
+  id: string;
+}>()
+
+const loaderStore = useLoader()
+const company = ref(getEmptyCompanyView())
+
+async function fetch () {
+  loaderStore.isActive = true
+  try {
+    company.value = (await findCompany(props.id)).data
+  } finally {
+    loaderStore.isActive = false
+  }
+}
+
+fetch()
+</script>
+
 <template>
   <div>
     <CompanyData
-      v-if="company"
+      v-if="company.id"
       :company="company"
-      @updated="fetch"
+      @deleted="$router.push({ name: 'companies' })"
+      @saved="fetch"
     />
-    <hr>
+
+    <hr />
+
     <CompanyAddresses
-      v-if="company"
+      v-if="company.id"
       :company="company"
     />
-    <hr>
+
     <CompanyEmployees
-      v-if="company"
+      v-if="company.id"
       :company="company"
     />
   </div>
 </template>
-
-<script>
-import CompanyData from '@/components/CompanyData'
-import { mapActions } from 'vuex'
-import { findCompany } from '@/api/companies'
-import CompanyAddresses from '@/components/CompanyAddresses'
-import CompanyEmployees from '@/components/CompanyEmployees'
-
-export default {
-  name: 'Company',
-  components: { CompanyEmployees, CompanyAddresses, CompanyData },
-  props: {
-    id: {
-      type: [Number, String],
-      required: true
-    }
-  },
-
-  data () {
-    return {
-      company: null
-    }
-  },
-
-  created () {
-    this.fetch()
-  },
-
-  methods: {
-    ...mapActions({
-      showLoadingOverlay: 'general/showLoadingOverlay',
-      hideLoadingOverlay: 'general/hideLoadingOverlay'
-    }),
-
-    async fetch () {
-      this.showLoadingOverlay()
-      try {
-        this.company = (await findCompany(this.id)).data
-      } finally {
-        this.hideLoadingOverlay()
-      }
-    }
-  }
-}
-</script>
-
-<style scoped>
-
-</style>

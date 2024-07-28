@@ -1,92 +1,35 @@
-<template>
-  <div>
-    <v-card v-if="invoice">
-      <v-card-title>
-        <h1>{{ $t('invoice') }} #{{ invoice.id }}</h1>
-      </v-card-title>
-
-      <v-card-subtitle>{{ $t('created-at') }}: {{ $options.datetimeFormat(invoice.created_at) }}</v-card-subtitle>
-      <v-card-text>
-        <b>{{ $t('seller') }}:</b>
-        <router-link :to="{ name: 'company', params: { id: invoice.seller.id } }">
-          {{ invoice.seller.name }}
-        </router-link>
-        <br>
-        <b>{{ $t('buyer') }}:</b>
-        <router-link :to="{ name: 'company', params: { id: invoice.buyer.id } }">
-          {{ invoice.buyer.name }}
-        </router-link>
-        <br>
-        <b>{{ $t('processed-by-employee') }}:</b> {{ invoice.processedByEmployee.name }}
-      </v-card-text>
-
-      <v-card-actions>
-        <v-icon
-          color="secondary"
-          large
-          :title="$t('download')"
-          @click="download"
-        >
-          mdi-download
-        </v-icon>
-      </v-card-actions>
-    </v-card>
-  </div>
-</template>
-
-<script>
-import { mapActions } from 'vuex'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { getEmptyInvoiceView } from '@/utils/forms'
+import { useLoader } from '@/stores/loader'
 import { findInvoice } from '@/api/invoices'
-import { downloadInvoiceDocument } from '@/utils/files'
-import { datetimeFormat } from '@/utils/string'
+import InvoiceData from '@/components/InvoiceData.vue'
 
-export default {
-  name: 'Invoice',
-  datetimeFormat,
-  props: {
-    id: {
-      type: [Number, String],
-      required: true
-    }
-  },
+const props = defineProps<{
+  id: string;
+}>()
 
-  data () {
-    return {
-      invoice: null
-    }
-  },
+const loaderStore = useLoader()
+const invoice = ref(getEmptyInvoiceView())
 
-  created () {
-    this.fetch()
-  },
-
-  methods: {
-    ...mapActions({
-      showLoadingOverlay: 'general/showLoadingOverlay',
-      hideLoadingOverlay: 'general/hideLoadingOverlay'
-    }),
-
-    async fetch () {
-      this.showLoadingOverlay()
-      try {
-        this.invoice = (await findInvoice(this.id)).data
-      } finally {
-        this.hideLoadingOverlay()
-      }
-    },
-
-    async download () {
-      try {
-        this.showLoadingOverlay()
-        await downloadInvoiceDocument(this.id)
-      } finally {
-        this.hideLoadingOverlay()
-      }
-    }
+async function fetch () {
+  loaderStore.isActive = true
+  try {
+    invoice.value = (await findInvoice(props.id)).data
+  } finally {
+    loaderStore.isActive = false
   }
 }
+
+fetch()
 </script>
 
-<style scoped>
-
-</style>
+<template>
+  <div>
+    <InvoiceData
+      v-if="invoice.id"
+      :invoice="invoice"
+      @deleted="$router.push({ name: 'invoices' })"
+    />
+  </div>
+</template>

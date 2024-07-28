@@ -35,6 +35,7 @@
   "name": "Name",
   "name-short": "Short Name",
   "fiscal-code": "Fiscal Code",
+  "pick-date": "Pick a date",
   "seller": "Seller",
   "buyer": "Buyer",
   "order-date": "Order Date",
@@ -51,10 +52,17 @@
   "actions": "Actions",
   "create": "Create",
   "download": "Download",
+  "open": "Open",
+  "close": "Close",
+  "noDataText": "No matching records found",
   "modal-confirm": {
-    "delete-question": "Are you sure you want to delete this item?"
+    "delete-confirmation": "Confirm deletion?"
+  },
+  "data-table": {
+    "no-data": "No matching records found"
   },
   "validation": {
+    "company-should-have-address": "Company should have at least one address",
     "required": "This field is required",
     "invalid": "Invalid value"
   },

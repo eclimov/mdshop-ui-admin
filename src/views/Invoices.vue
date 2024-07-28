@@ -1,151 +1,162 @@
-<template>
-  <v-card>
-    <ModalConfirm
-      v-if="isModalDeleteActive"
-      @cancel="resetEditedId"
-      @confirm="deleteItemConfirm(editedId)"
-    />
-
-    <v-card-title>
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        :label="$t('search')"
-        single-line
-        hide-details
-      />
-    </v-card-title>
-
-    <!-- TODO: expand row with details: https://vuetifyjs.com/en/components/data-tables/#expandable-rows-->
-    <!--OR https://codepen.io/francobao/pen/mqxMKP-->
-    <v-data-table
-      dense
-      :items-per-page="items.length"
-      :headers="headers"
-      :items="items"
-      class="elevation-1"
-      :loading="isLoading"
-      :loading-text="$t('loading-text')"
-      :search="search"
-      hide-default-footer
-    >
-      <template v-slot:item.id="{ item }">
-        <router-link :to="{ name: 'invoice', params: { id: item.id } }">
-          {{ item.id }}
-        </router-link>
-      </template>
-
-      <template v-slot:item.buyer.name="{ item }">
-        <router-link :to="{ name: 'company', params: { id: item.buyer.id } }">
-          {{ item.buyer.name }}
-        </router-link>
-      </template>
-
-      <template v-slot:item.created_at="{ item }">
-        {{ $options.datetimeFormat(item.created_at) }}
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          color="secondary"
-          :title="$t('download')"
-          @click="download(item.id)"
-        >
-          mdi-download
-        </v-icon>
-        &nbsp;
-        <v-icon
-          color="error"
-          @click="deleteItem(item)"
-        >
-          mdi-delete
-        </v-icon>
-      </template>
-    </v-data-table>
-  </v-card>
-</template>
-
-<script>
-
-import { getInvoices, deleteInvoice } from '@/api/invoices'
+<script setup lang="ts">
 import { datetimeFormat } from '@/utils/string'
-import { mapActions } from 'vuex'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import ModalConfirm from '@/components/ModalConfirm.vue'
+import { getEmptyInvoiceView } from '@/utils/forms'
+import { deleteInvoice, getInvoices } from '@/api/invoices'
+import type { InvoiceTypeView } from '@/types/invoice'
 import { downloadInvoiceDocument } from '@/utils/files'
-import ModalConfirm from '../components/ModalConfirm'
+import { useLoader } from '@/stores/loader'
 
-export default {
-  name: 'Invoices',
-  datetimeFormat,
-  components: { ModalConfirm },
-
-  data () {
-    return {
-      isLoading: false,
-      isModalDeleteActive: false,
-      editedId: 0,
-      search: '',
-      headers: [
-        {
-          text: 'ID',
-          align: 'start',
-          value: 'id'
-        },
-        { text: this.$t('buyer'), value: 'buyer.name' },
-        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
-        { text: this.$t('actions'), value: 'actions', sortable: false }
-      ],
-      items: []
-    }
+const loaderStore = useLoader()
+const { t } = useI18n()
+const isLoading = ref(false)
+const isModalDeleteActive = ref(false)
+const editedItem = ref(getEmptyInvoiceView())
+const search = ref('')
+const headers = ref([
+  {
+    title: 'ID',
+    align: 'start',
+    value: 'id',
+    sortable: true
   },
+  { title: t('buyer'), value: 'buyer.name', sortable: true },
+  { title: t('created-at'), value: 'created_at' },
+  { title: t('actions'), value: 'actions' }
+] as const)
+const items = ref([])
 
-  async created () {
-    await this.fetch()
-  },
-
-  methods: {
-    ...mapActions({
-      showLoadingOverlay: 'general/showLoadingOverlay',
-      hideLoadingOverlay: 'general/hideLoadingOverlay'
-    }),
-
-    async fetch () {
-      this.isLoading = true
-      try {
-        this.items = (await getInvoices()).data
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    async download (id) {
-      try {
-        this.showLoadingOverlay()
-        await downloadInvoiceDocument(id)
-      } finally {
-        this.hideLoadingOverlay()
-      }
-    },
-
-    resetEditedId () {
-      this.editedId = 0
-      this.isModalDeleteActive = false
-    },
-
-    deleteItem (item) {
-      this.editedId = item.id
-      this.isModalDeleteActive = true
-    },
-
-    async deleteItemConfirm (id) {
-      this.resetEditedId()
-      this.isLoading = true
-      try {
-        await deleteInvoice(id)
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    }
+async function fetch () {
+  isLoading.value = true
+  try {
+    items.value = (await getInvoices()).data
+  } finally {
+    isLoading.value = false
   }
 }
+
+function deleteItem (item: InvoiceTypeView) {
+  editedItem.value = { ...item }
+  isModalDeleteActive.value = true
+}
+
+function resetEditedItem () {
+  editedItem.value = getEmptyInvoiceView()
+}
+
+function closeDialogDelete () {
+  isModalDeleteActive.value = false
+  resetEditedItem()
+}
+
+async function deleteItemConfirm (id: number) {
+  closeDialogDelete()
+  isLoading.value = true
+  try {
+    await deleteInvoice(id)
+  } finally {
+    await fetch()
+    isLoading.value = false
+  }
+}
+
+async function download (id: number) {
+  try {
+    loaderStore.isActive = true
+    await downloadInvoiceDocument(id)
+  } finally {
+    loaderStore.isActive = false
+  }
+}
+
+fetch()
 </script>
+
+<template>
+  <ModalConfirm
+    v-if="isModalDeleteActive"
+    :object-value="`${editedItem.buyer.name} ${datetimeFormat(editedItem.created_at)}`"
+    @cancel="closeDialogDelete"
+    @confirm="deleteItemConfirm(editedItem.id)"
+  />
+
+  <v-container fluid>
+    <v-row no-gutters>
+      <v-col
+        class="d-flex align-center"
+        cols="12"
+      >
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          class="flex-grow-1"
+          hide-details
+          :label="$t('search')"
+          single-line
+          variant="underlined"
+        />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <v-data-table
+          class="elevation-1"
+          density="compact"
+          :headers="headers"
+          hide-default-footer
+          hover
+          :items="items"
+          :items-per-page="items.length"
+          :loading="isLoading"
+          :loading-text="$t('loading-text')"
+          :search="search"
+        >
+          <template #loader>
+            <v-progress-linear
+              color="primary"
+              indeterminate
+            />
+          </template>
+
+          <template #no-data>
+            {{ $t('data-table.no-data') }}
+          </template>
+
+          <template #[`item.id`]="{ item, value }: any">
+            <router-link :to="{ name: 'invoice', params: { id: item.id } }">
+              {{ value }}
+            </router-link>
+          </template>
+
+          <template #[`item.buyer.name`]="{ item, value }: any">
+            <router-link :to="{ name: 'company', params: { id: item.buyer.id } }">
+              {{ value }}
+            </router-link>
+          </template>
+
+          <template #[`item.created_at`]="{ value }">
+            {{ datetimeFormat(value) }}
+          </template>
+
+          <template #[`item.actions`]="{ item }: any">
+            <v-icon
+              color="blue-grey-darken-4"
+              icon="mdi-download"
+              :title="$t('download')"
+              @click="download(item.id)"
+            />
+            &nbsp;
+            <v-icon
+              color="error"
+              icon="mdi-delete"
+              size="small"
+              @click="deleteItem(item)"
+            />
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>

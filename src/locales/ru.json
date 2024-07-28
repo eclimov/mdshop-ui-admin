@@ -35,6 +35,7 @@
   "name": "Имя",
   "name-short": "Имя укороч.",
   "fiscal-code": "Фискальный код",
+  "pick-date": "Выбрать дату",
   "seller": "Продавец",
   "buyer": "Покупатель",
   "order-date": "Дата выписки",
@@ -51,10 +52,17 @@
   "actions": "Действия",
   "create": "Создать",
   "download": "Скачать",
+  "open": "Открыть",
+  "close": "Закрыть",
+  "noDataText": "Не найдено данных по запросу",
   "modal-confirm": {
-    "delete-question": "Вы точно хотите удалить этот объект?"
+    "delete-confirmation": "Подтвердить удаление?"
+  },
+  "data-table": {
+    "no-data": "Не найдено данных по запросу"
   },
   "validation": {
+    "company-should-have-address": "У компании должен быть хотя бы один адрес",
     "required": "Обязательно для заполнения",
     "invalid": "Невалидное значение"
   },

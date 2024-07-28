@@ -1,253 +1,200 @@
-<template>
-  <v-card>
-    <ModalConfirm
-      v-if="isModalDeleteActive"
-      @cancel="resetEditedId"
-      @confirm="deleteItemConfirm(editedId)"
-    />
-
-    <v-card-title>{{ $t('company-addresses') }}</v-card-title>
-
-    <v-card-title>
-      <v-dialog
-        v-model="dialog"
-        max-width="500px"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="success"
-            dark
-            large
-            v-bind="attrs"
-            class="mr-2"
-            :title="$t('new-item')"
-            v-on="on"
-          >
-            <span class="material-icons">
-              add_box
-            </span>
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title>
-
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="8">
-                  <v-text-field
-                    v-model="editedItem.address"
-                    autofocus
-                    :label="$t('company-address')"
-                  />
-                </v-col>
-
-                <v-col cols="4">
-                  <v-checkbox
-                    v-model="editedItem.juridic"
-                    :label="$t('juridic')"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="close"
-            >
-              {{ $t('cancel') }}
-            </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="save"
-            >
-              {{ $t('save') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        :label="$t('search')"
-        single-line
-        hide-details
-      />
-    </v-card-title>
-
-    <v-data-table
-      dense
-      :items-per-page="items.length"
-      :headers="headers"
-      :items="items"
-      class="elevation-1"
-      :loading="isLoading"
-      :loading-text="$t('loading-text')"
-      :search="search"
-      hide-default-footer
-    >
-      <template v-slot:item.juridic="{ item }">
-        <v-icon v-if="item.juridic">
-          mdi-check
-        </v-icon>
-      </template>
-
-      <template v-slot:item.created_at="{ item }">
-        {{ $options.datetimeFormat(item.created_at) }}
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          color="warning"
-          @click="editItem(item)"
-        >
-          mdi-pencil
-        </v-icon>
-        <v-icon
-          small
-          color="error"
-          @click="deleteItem(item)"
-        >
-          mdi-delete
-        </v-icon>
-      </template>
-    </v-data-table>
-  </v-card>
-</template>
-
-<script>
-import ModalConfirm from '@/components/ModalConfirm'
+<script setup lang="ts">
 import { datetimeFormat } from '@/utils/string'
-import { getCompanyAddressObject } from '@/utils/forms'
+import { getEmptyCompanyAddressView } from '@/utils/forms'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import ModalConfirm from '@/components/ModalConfirm.vue'
+import type { CompanyTypeView } from '@/types/company'
+import type { CompanyAddressTypeView } from '@/types/companyAddress'
+import { deleteCompanyAddress } from '@/api/companyAddresses'
 import { getCompanyAddressesByCompanyId } from '@/api/companies'
-import { createCompanyAddress, deleteCompanyAddress, updateCompanyAddress } from '@/api/companyAddresses'
+import CompanyAddressForm from '@/components/forms/CompanyAddressForm.vue'
 
-export default {
-  name: 'CompanyAddresses',
-  components: { ModalConfirm },
-  datetimeFormat,
-  props: {
-    company: {
-      type: Object,
-      required: true
-    }
+const props = defineProps<{
+  company: CompanyTypeView;
+}>()
+
+const { t } = useI18n()
+const isLoading = ref(false)
+const isModalDeleteActive = ref(false)
+const dialog = ref(false)
+const editedItem = ref(getEmptyCompanyAddressView())
+const search = ref('')
+const headers = ref([
+  {
+    title: 'ID',
+    align: 'start',
+    value: 'id',
+    sortable: true
   },
+  { title: t('address'), value: 'address', sortable: true },
+  { title: t('is-juridic'), value: 'juridic', sortable: true },
+  { title: t('created-at'), value: 'created_at' },
+  { title: t('actions'), value: 'actions' }
+] as const)
+const items = ref([])
 
-  data () {
-    return {
-      isLoading: false,
-      isModalDeleteActive: false,
-      dialog: false,
-      editedId: 0,
-      search: '',
-      headers: [
-        {
-          text: 'ID',
-          align: 'start',
-          value: 'id'
-        },
-        { text: this.$t('address'), value: 'address' },
-        { text: this.$t('is-juridic'), value: 'juridic' },
-        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
-        { text: this.$t('actions'), value: 'actions', sortable: false }
-      ],
-      items: [],
-      editedItem: getCompanyAddressObject(this.company.id),
-      defaultItem: getCompanyAddressObject(this.company.id)
-    }
-  },
+function onSaved () {
+  closeDialogEdit()
+  fetch()
+}
 
-  computed: {
-    formTitle () {
-      return this.editedId ? this.$t('edit-item') : this.$t('new-item')
-    }
-  },
+function editItem (item: CompanyAddressTypeView) {
+  editedItem.value = { ...item }
+  dialog.value = true
+}
 
-  watch: {
-    dialog (val) {
-      val || this.close()
-    }
-  },
+function deleteItem (item: CompanyAddressTypeView) {
+  editedItem.value = { ...item }
+  isModalDeleteActive.value = true
+}
 
-  async created () {
-    await this.fetch()
-  },
+function resetEditedItem () {
+  editedItem.value = getEmptyCompanyAddressView()
+}
 
-  methods: {
-    async fetch () {
-      this.isLoading = true
-      try {
-        this.items = (await getCompanyAddressesByCompanyId(this.company.id)).data
-      } finally {
-        this.isLoading = false
-      }
-    },
+function closeDialogDelete () {
+  isModalDeleteActive.value = false
+  resetEditedItem()
+}
 
-    async save () {
-      const editedId = this.editedId
-      const editedItem = this.editedItem
+function closeDialogEdit () {
+  dialog.value = false
+}
 
-      this.close()
-
-      try {
-        this.isLoading = true
-        if (editedId) {
-          await updateCompanyAddress(editedId, editedItem)
-        } else {
-          await createCompanyAddress(editedItem)
-        }
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    editItem (item) {
-      this.editedId = item.id
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
-    },
-
-    deleteItem (item) {
-      this.editedId = item.id
-      this.isModalDeleteActive = true
-    },
-
-    async deleteItemConfirm (id) {
-      this.resetEditedId()
-      this.isLoading = true
-      try {
-        await deleteCompanyAddress(id)
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    close () {
-      this.dialog = false
-      this.editedItem = Object.assign({}, this.defaultItem)
-      this.resetEditedId()
-    },
-
-    resetEditedId () {
-      this.editedId = 0
-      this.isModalDeleteActive = false
-    }
+async function deleteItemConfirm (id: number) {
+  closeDialogDelete()
+  isLoading.value = true
+  try {
+    await deleteCompanyAddress(id)
+  } finally {
+    await fetch()
+    isLoading.value = false
   }
 }
+
+async function fetch () {
+  isLoading.value = true
+  try {
+    items.value = (await getCompanyAddressesByCompanyId(props.company.id)).data
+  } finally {
+    isLoading.value = false
+  }
+}
+
+fetch()
 </script>
 
-<style scoped>
 
-</style>
+<template>
+  <v-dialog
+    v-model="dialog"
+    max-width="500px"
+    @after-leave="resetEditedItem"
+  >
+    <CompanyAddressForm
+      v-model:company-address="editedItem"
+      @cancel="closeDialogEdit"
+      @saved="onSaved"
+    />
+  </v-dialog>
+
+  <ModalConfirm
+    v-if="isModalDeleteActive"
+    :object-value="editedItem.address"
+    @cancel="closeDialogDelete"
+    @confirm="deleteItemConfirm(editedItem.id)"
+  />
+
+  <v-container>
+    <v-row>
+      <v-col class="text-h5">
+        {{ $t('company-addresses') }}
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col
+        class="d-flex align-center"
+        cols="12"
+      >
+        <v-btn
+          class="mr-4"
+          color="success"
+          rounded="md"
+          :title="$t('new-item')"
+          @click="dialog = true"
+        >
+          <v-icon size="large">
+            mdi-plus-box
+          </v-icon>
+        </v-btn>
+
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          class="flex-grow-1"
+          hide-details
+          :label="$t('search')"
+          single-line
+          variant="underlined"
+        />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <v-data-table
+          class="elevation-1"
+          density="compact"
+          :headers="headers"
+          hide-default-footer
+          hover
+          :items="items"
+          :items-per-page="items.length"
+          :loading="isLoading"
+          :loading-text="$t('loading-text')"
+          :search="search"
+        >
+          <template #loader>
+            <v-progress-linear
+              color="primary"
+              indeterminate
+            />
+          </template>
+
+          <template #no-data>
+            {{ $t('data-table.no-data') }}
+          </template>
+
+          <template #[`item.juridic`]="{ value }">
+            <v-icon
+              v-if="value"
+              icon="mdi-check"
+            />
+          </template>
+
+          <template #[`item.created_at`]="{ value }">
+            {{ datetimeFormat(value) }}
+          </template>
+
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              class="mr-2"
+              color="warning"
+              icon="mdi-pencil"
+              size="small"
+              @click="editItem(item)"
+            />
+            &nbsp;
+            <v-icon
+              color="error"
+              icon="mdi-delete"
+              size="small"
+              @click="deleteItem(item)"
+            />
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+

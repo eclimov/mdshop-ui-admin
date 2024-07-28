@@ -1,27 +1,34 @@
+<script setup lang="ts">
+import imageLogo from '@/assets/logo.png'
+
+function redirectToLocation () {
+  window.open('https://goo.gl/maps/Ca6rMzR8Ko26bHBN8', '_blank')
+}
+</script>
+
 <template>
   <v-container>
     <v-row class="text-center">
       <v-col cols="12">
         <v-img
-          :src="require('@/assets/logo.png')"
           class="my-3"
-          contain
+          draggable="false"
           height="200"
+          :src="imageLogo"
         />
       </v-col>
 
       <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">
+        <div class="text-h3 font-weight-bold mb-3">
           Artprezent
 
           <v-btn
-            icon
+            icon="mdi-map-marker"
             :title="$t('location')"
+            variant="text"
             @click="redirectToLocation"
-          >
-            <v-icon>location_on</v-icon>
-          </v-btn>
-        </h1>
+          />
+        </div>
 
         <p class="subheading font-weight-regular">
           {{ $t('for-all-questions-contact') }} <b>Eduard Climov</b>
@@ -30,18 +37,3 @@
     </v-row>
   </v-container>
 </template>
-
-<script>
-
-export default {
-  name: 'Home',
-
-  components: {},
-
-  methods: {
-    redirectToLocation () {
-      window.open('https://goo.gl/maps/Ca6rMzR8Ko26bHBN8', '_blank')
-    }
-  }
-}
-</script>

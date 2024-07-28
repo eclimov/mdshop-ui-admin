@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:16.10.0 # Node 18 cannot be used atm because of https://github.com/vuejs/vue-cli/issues/7116
+      - image: cimg/node:20.16.0
     parallelism: 1
     working_directory: ~/eclimov/mdshop-ui-admin
     steps:
@@ -22,8 +22,8 @@ jobs:
           paths: [dist]
 
   deploy:
-    docker:
-      - image: docker:18.05.0-ce-git
+#    docker:
+#      - image: docker:18.05.0-ce-git # TODO: remove this step?
     parallelism: 1
     working_directory: ~/eclimov/mdshop-ui-admin
     steps:

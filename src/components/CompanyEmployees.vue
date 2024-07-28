@@ -1,193 +1,192 @@
-<template>
-  <v-card>
-    <ModalConfirm
-      v-if="isModalDeleteActive"
-      @cancel="resetEditedId"
-      @confirm="deleteItemConfirm(editedId)"
-    />
-
-    <v-card-title>{{ $t('company-employees') }}</v-card-title>
-
-    <v-card-title>
-      <v-dialog
-        v-model="dialog"
-        max-width="500px"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="success"
-            dark
-            large
-            v-bind="attrs"
-            class="mr-2"
-            :title="$t('new-item')"
-            v-on="on"
-          >
-            <span class="material-icons">
-              add_box
-            </span>
-          </v-btn>
-        </template>
-        <!--v-if="dialog" destroys the component on close-->
-        <CompanyEmployeeForm
-          v-if="dialog"
-          :company-id="company.id"
-          :company-employee-id="editedId"
-          @cancel="modalClose"
-          @ok="modalOk"
-        />
-      </v-dialog>
-
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        :label="$t('search')"
-        single-line
-        hide-details
-      />
-    </v-card-title>
-
-    <v-data-table
-      dense
-      :items-per-page="items.length"
-      :headers="headers"
-      :items="items"
-      class="elevation-1"
-      :loading="isLoading"
-      :loading-text="$t('loading-text')"
-      :search="search"
-      hide-default-footer
-    >
-      <template v-slot:item.created_at="{ item }">
-        {{ $options.datetimeFormat(item.created_at) }}
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          color="warning"
-          @click="editItem(item)"
-        >
-          mdi-pencil
-        </v-icon>
-        <v-icon
-          small
-          color="error"
-          @click="deleteItem(item)"
-        >
-          mdi-delete
-        </v-icon>
-      </template>
-    </v-data-table>
-  </v-card>
-</template>
-
-<script>
-import ModalConfirm from '@/components/ModalConfirm'
+<script setup lang="ts">
 import { datetimeFormat } from '@/utils/string'
-import { getCompanyEmployeesByCompanyId } from '@/api/companies'
+import { getEmptyCompanyEmployeeView } from '@/utils/forms'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import ModalConfirm from '@/components/ModalConfirm.vue'
+import type { CompanyEmployeeTypeView } from '@/types/companyEmployee'
 import { deleteCompanyEmployee } from '@/api/companyEmployees'
-import CompanyEmployeeForm from '@/components/forms/CompanyEmployeeForm'
+import { getCompanyEmployeesByCompanyId } from '@/api/companies'
+import CompanyEmployeeForm from '@/components/forms/CompanyEmployeeForm.vue'
+import type { CompanyTypeView } from '@/types/company'
 
-export default {
-  name: 'CompanyEmployees',
-  components: { CompanyEmployeeForm, ModalConfirm },
-  datetimeFormat,
-  props: {
-    company: {
-      type: Object,
-      required: true
-    }
+const props = defineProps<{
+  company: CompanyTypeView;
+}>()
+
+const { t } = useI18n()
+const isLoading = ref(false)
+const isModalDeleteActive = ref(false)
+const dialog = ref(false)
+const editedItem = ref(getEmptyCompanyEmployeeView())
+const search = ref('')
+const headers = ref([
+  {
+    title: 'ID',
+    align: 'start',
+    value: 'id',
+    sortable: true
   },
+  { title: t('name'), value: 'name', sortable: true },
+  { title: t('position'), value: 'position', sortable: true },
+  { title: t('created-at'), value: 'created_at' },
+  { title: t('actions'), value: 'actions' }
+] as const)
+const items = ref([])
 
-  data () {
-    return {
-      isLoading: false,
-      isModalDeleteActive: false,
-      dialog: false,
-      editedId: 0,
-      search: '',
-      headers: [
-        {
-          text: 'ID',
-          align: 'start',
-          value: 'id'
-        },
-        { text: this.$t('name'), value: 'name' },
-        { text: this.$t('position'), value: 'position' },
-        { text: this.$t('created-at'), sortable: false, value: 'created_at' },
-        { text: this.$t('actions'), value: 'actions', sortable: false }
-      ],
-      employeeNameRules: [
-        v => !!v || this.$t('validation.required')
-      ],
-      employeePositionRules: [
-        v => !!v || this.$t('validation.required')
-      ],
-      items: []
-    }
-  },
+function onSaved () {
+  closeDialogEdit()
+  fetch()
+}
 
-  watch: {
-    dialog (val) {
-      val || this.modalClose()
-    }
-  },
+function editItem (item: CompanyEmployeeTypeView) {
+  editedItem.value = { ...item }
+  dialog.value = true
+}
 
-  async created () {
-    await this.fetch()
-  },
+function deleteItem (item: CompanyEmployeeTypeView) {
+  editedItem.value = { ...item }
+  isModalDeleteActive.value = true
+}
 
-  methods: {
-    async fetch () {
-      this.isLoading = true
-      try {
-        this.items = (await getCompanyEmployeesByCompanyId(this.company.id)).data
-      } finally {
-        this.isLoading = false
-      }
-    },
+function resetEditedItem () {
+  editedItem.value = getEmptyCompanyEmployeeView()
+}
 
-    editItem (item) {
-      this.editedId = item.id
-      this.dialog = true
-    },
+function closeDialogDelete () {
+  isModalDeleteActive.value = false
+  resetEditedItem()
+}
 
-    deleteItem (item) {
-      this.editedId = item.id
-      this.isModalDeleteActive = true
-    },
+function closeDialogEdit () {
+  dialog.value = false
+}
 
-    async deleteItemConfirm (id) {
-      this.resetEditedId()
-      this.isLoading = true
-      try {
-        await deleteCompanyEmployee(id)
-      } finally {
-        await this.fetch()
-        this.isLoading = false
-      }
-    },
-
-    modalClose () {
-      this.dialog = false
-      this.resetEditedId()
-    },
-
-    modalOk () {
-      this.fetch()
-      this.modalClose()
-    },
-
-    resetEditedId () {
-      this.editedId = 0
-      this.isModalDeleteActive = false
-    }
+async function deleteItemConfirm (id: number) {
+  closeDialogDelete()
+  isLoading.value = true
+  try {
+    await deleteCompanyEmployee(id)
+  } finally {
+    await fetch()
+    isLoading.value = false
   }
 }
+
+async function fetch () {
+  isLoading.value = true
+  try {
+    items.value = (await getCompanyEmployeesByCompanyId(props.company.id)).data
+  } finally {
+    isLoading.value = false
+  }
+}
+
+fetch()
 </script>
 
-<style scoped>
 
-</style>
+<template>
+  <v-dialog
+    v-model="dialog"
+    max-width="500px"
+    @after-leave="resetEditedItem"
+  >
+    <CompanyEmployeeForm
+      v-model:company-employee="editedItem"
+      @cancel="closeDialogEdit"
+      @saved="onSaved"
+    />
+  </v-dialog>
+
+  <ModalConfirm
+    v-if="isModalDeleteActive"
+    :object-value="editedItem.name"
+    @cancel="closeDialogDelete"
+    @confirm="deleteItemConfirm(editedItem.id)"
+  />
+
+  <v-container>
+    <v-row>
+      <v-col class="text-h5">
+        {{ $t('company-employees') }}
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col
+        class="d-flex align-center"
+        cols="12"
+      >
+        <v-btn
+          class="mr-4"
+          color="success"
+          rounded="md"
+          :title="$t('new-item')"
+          @click="dialog = true"
+        >
+          <v-icon size="large">
+            mdi-plus-box
+          </v-icon>
+        </v-btn>
+
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          class="flex-grow-1"
+          hide-details
+          :label="$t('search')"
+          single-line
+          variant="underlined"
+        />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <v-data-table
+          class="elevation-1"
+          density="compact"
+          :headers="headers"
+          hide-default-footer
+          hover
+          :items="items"
+          :items-per-page="items.length"
+          :loading="isLoading"
+          :loading-text="$t('loading-text')"
+          :search="search"
+        >
+          <template #loader>
+            <v-progress-linear
+              color="primary"
+              indeterminate
+            />
+          </template>
+
+          <template #no-data>
+            {{ $t('data-table.no-data') }}
+          </template>
+
+          <template #[`item.created_at`]="{ value }">
+            {{ datetimeFormat(value) }}
+          </template>
+
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              class="mr-2"
+              color="warning"
+              icon="mdi-pencil"
+              size="small"
+              @click="editItem(item)"
+            />
+            &nbsp;
+            <v-icon
+              color="error"
+              icon="mdi-delete"
+              size="small"
+              @click="deleteItem(item)"
+            />
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
