@@ -22,8 +22,8 @@ jobs:
           paths: [dist]
 
   deploy:
-#    docker:
-#      - image: docker:18.05.0-ce-git # TODO: remove this step?
+    docker:
+      - image: docker:18.05.0-ce-git
     parallelism: 1
     working_directory: ~/eclimov/mdshop-ui-admin
     steps:
