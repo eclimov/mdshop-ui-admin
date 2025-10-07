@@ -19,7 +19,20 @@ const isAuthenticated = computed(() => {
   return !!userEmail.value
 })
 
-async function logout () {
+const navigationRoutes = computed(() => {
+  return [
+    'invoices',
+    'companies',
+    'banks',
+    'catalog'
+    // 'users' // No need to display the following link to users
+  ].filter((name) => {
+    const requiresAuth = router.resolve({ name }).meta.requiresAuth
+    return (isAuthenticated.value && requiresAuth) || !requiresAuth
+  })
+})
+
+async function logout() {
   userStore.reset()
   await router.push({ name: 'home' })
 }
@@ -39,37 +52,15 @@ async function logout () {
       </router-link>
     </div>
 
-    <div v-if="isAuthenticated">
+    <div>
       <v-btn
-        :to="{ name: 'invoices' }"
+        v-for="navigationRouteName in navigationRoutes"
+        :key="navigationRouteName"
+        :to="{ name: navigationRouteName }"
         variant="text"
       >
-        {{ $t('invoices') }}
+        {{ $t(navigationRouteName) }}
       </v-btn>
-
-      <v-btn
-        :to="{ name: 'companies' }"
-        variant="text"
-      >
-        {{ $t('companies') }}
-      </v-btn>
-
-      <v-btn
-        :to="{ name: 'banks' }"
-        variant="text"
-      >
-        {{ $t('banks') }}
-      </v-btn>
-
-      <!--No need to display the following link to users-->
-      <!--
-      <v-btn
-        :to="{ name: 'users' }"
-        variant="text"
-      >
-        Users
-      </v-btn>
-      -->
     </div>
 
     <v-spacer />
@@ -85,20 +76,8 @@ async function logout () {
           </router-link>
         </span>
       </div>
-      <v-btn
-        class="ml-2"
-        color="warning"
-        icon="mdi-logout"
-        variant="text"
-        @click="logout"
-      />
+      <v-btn class="ml-2" color="warning" icon="mdi-logout" variant="text" @click="logout" />
     </template>
-    <v-btn
-      v-else
-      icon="mdi-login"
-      :title="$t('login')"
-      :to="{ name: 'login' }"
-      variant="text"
-    />
+    <v-btn v-else icon="mdi-login" :title="$t('login')" :to="{ name: 'login' }" variant="text" />
   </v-app-bar>
 </template>
