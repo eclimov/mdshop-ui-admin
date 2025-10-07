@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const headers = [
+const headers = ref([
   { title: '№', key: 'id', align: 'end' },
   { title: 'img', key: 'image', align: 'center', sortable: false }, // Define a key for the custom column
   { title: 'RU', key: 'nameRu', width: '45%', align: 'start' },
   { title: 'RO', key: 'nameRo', width: '45%', align: 'start' }
-]
+] as const)
 const items = [
   { id: 1, nameRu: 'Тетради', nameRo: 'Caiete' },
   { id: 2, nameRu: 'Бытовая техника', nameRo: 'Aparate De Uz Casnic' },
@@ -164,7 +164,7 @@ const search = ref('')
     <v-row class="justify-center pa-0">
       <v-col cols="auto">
         <v-card min-width="800px" max-width="90vw">
-          <template v-slot:text>
+          <template #text>
             <v-text-field
               v-model="search"
               :label="$t('search')"
