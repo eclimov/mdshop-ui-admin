@@ -11,6 +11,7 @@ import Users from '@/views/Users.vue'
 import User from '@/views/User.vue'
 import CreateInvoice from '@/views/CreateInvoice.vue'
 import { useUser } from '@/stores/user'
+import Catalog from '@/views/Catalog.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -108,6 +109,14 @@ const router = createRouter({
         requiresAuth: true
       }
     },
+    {
+      path: '/catalog',
+      name: 'catalog',
+      component: Catalog,
+      meta: {
+        requiresAuth: false
+      }
+    }
   ]
 })
 
@@ -120,8 +129,8 @@ router.beforeEach((to, from, next) => {
     next({ name: 'login' })
   } else {
     // Allow access
-    next();
+    next()
   }
-});
+})
 
 export default router
