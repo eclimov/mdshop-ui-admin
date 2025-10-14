@@ -180,6 +180,7 @@ const search = ref('')
           <v-data-table
             density="compact"
             items-per-page="-1"
+            :cell-props="{ class: 'v-data-table-cell-custom' }"
             hide-default-footer
             hover
             :headers="headers"
@@ -190,7 +191,7 @@ const search = ref('')
               <b>{{ value }}</b>
             </template>
             <template #[`item.image`]="{ item }: any">
-              <img loading="lazy" :src="`/products/${item.id}.png`" height="32" max-width="32" />
+              <img loading="lazy" :src="`/products/${item.id}.png`" height="48" max-width="48" />
             </template>
           </v-data-table>
         </v-card>
