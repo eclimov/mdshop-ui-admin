@@ -1,8 +1,4 @@
-# 🛍️ MDShop UI Admin
-
-A modern **admin dashboard** built for **MDShop** ecosystem. A clean and fast interface for managing.
-
-## Tech stack
+# mdshop-ui-admin [![eclimov](https://circleci.com/gh/eclimov/mdshop-ui-admin.svg?style=svg)](https://circleci.com/gh/eclimov/mdshop-ui-admin)
 
 <p align="center">
   <img alt="Vue 3" src="https://img.shields.io/badge/-Vue-42b883?style=flat-square&logo=vuedotjs&logoColor=white"/>
@@ -13,8 +9,7 @@ A modern **admin dashboard** built for **MDShop** ecosystem. A clean and fast in
   <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white"/>
 </p>
 
-
-## 🧑‍💻 Getting Started
+## Setup
 
 ### Prerequisites
 
@@ -61,7 +56,7 @@ npm run preview
 
 This serves the production build at [http://localhost:8080](http://localhost:8080).
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository  
 2. Create a new branch (`feat/your-feature`)  
