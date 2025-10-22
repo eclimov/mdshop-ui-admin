@@ -5,7 +5,22 @@ const headers = ref([
   { title: '№', key: 'id', align: 'end' },
   { title: 'img', key: 'image', align: 'center', sortable: false }, // Define a key for the custom column
   { title: 'RU', key: 'nameRu', width: '45%', align: 'start' },
-  { title: 'RO', key: 'nameRo', width: '45%', align: 'start' }
+  {
+    title: 'RO',
+    key: 'nameRo',
+    width: '45%',
+    align: 'start',
+    filter: (value: string, query: string) => {
+      const valueWithoutDiacritics = value
+        .toLowerCase()
+        .replace(/â/g, 'a')
+        .replace(/ă/g, 'a')
+        .replace(/î/g, 'i')
+        .replace(/ț/g, 't')
+        .replace(/ș/g, 's')
+      return valueWithoutDiacritics.includes(query.toLowerCase())
+    }
+  }
 ] as const)
 const items = [
   { id: 1, nameRu: 'Тетради', nameRo: 'Caiete' },
@@ -16,20 +31,20 @@ const items = [
   { id: 6, nameRu: 'Мяч', nameRo: 'Minge' },
   { id: 7, nameRu: 'Свечи', nameRo: 'Lumanari' },
   { id: 8, nameRu: 'Бадминтон', nameRo: 'Badminton' },
-  { id: 9, nameRu: 'Шары', nameRo: 'Mingi' },
+  { id: 9, nameRu: 'Воздушные шары', nameRo: 'Baloane' },
   { id: 10, nameRu: 'Батарейки', nameRo: 'Baterii' },
-  { id: 11, nameRu: 'Самокат', nameRo: 'Scuter' },
+  { id: 11, nameRu: 'Самокат', nameRo: 'Trotineta' },
   { id: 12, nameRu: 'Зарядные устройства', nameRo: 'Încărcătoare' },
   { id: 13, nameRu: 'Диски', nameRo: 'Discuri' },
-  { id: 14, nameRu: 'Флэшки', nameRo: 'Unități Flash' },
+  { id: 14, nameRu: 'Флешка', nameRo: 'Stic' },
   { id: 15, nameRu: 'Наушники', nameRo: 'Căști' },
-  { id: 16, nameRu: 'Микрофон, колонки', nameRo: 'Microfon, Difuzoare' },
+  { id: 16, nameRu: 'Микрофон, колонки', nameRo: 'Microfon, boxa' },
   { id: 17, nameRu: 'Комп.для компьютера', nameRo: 'Accesori p-u calculator' },
   { id: 18, nameRu: 'Пяльца', nameRo: 'Cerc p-u broderie' },
   { id: 19, nameRu: 'Канва', nameRo: 'Pânză' },
   { id: 20, nameRu: 'Вышивка', nameRo: 'Broderie' },
-  { id: 21, nameRu: 'Сантиметр', nameRo: 'Centimetru' },
-  { id: 22, nameRu: 'Нитки', nameRo: 'Ata' },
+  { id: 21, nameRu: 'Сантиметр', nameRo: 'Banda de croitorie' },
+  { id: 22, nameRu: 'Нитки', nameRo: 'Ața' },
   { id: 23, nameRu: 'Спицы', nameRo: 'Andrele' },
   { id: 24, nameRu: 'Крючок', nameRo: 'Cârlig' },
   { id: 25, nameRu: 'Молния', nameRo: 'Fermoar' },
@@ -39,7 +54,7 @@ const items = [
   { id: 29, nameRu: 'Разукрашка', nameRo: 'Carte De Colorat' },
   { id: 30, nameRu: 'Книги', nameRo: 'Cărți' },
   { id: 31, nameRu: 'Бижутерия', nameRo: 'Bijuterie' },
-  { id: 32, nameRu: 'Заколки', nameRo: 'Acele De Păr' },
+  { id: 32, nameRu: 'Заколки', nameRo: 'Agrafe' },
   { id: 33, nameRu: 'Резинки', nameRo: 'Legatura' },
   { id: 34, nameRu: 'Термос', nameRo: 'Termos' },
   { id: 35, nameRu: 'Сувениры', nameRo: 'Suveniruri' },
@@ -50,7 +65,7 @@ const items = [
   { id: 40, nameRu: 'Клей', nameRo: 'Lipici' },
   { id: 41, nameRu: 'Зеркало', nameRo: 'Oglindă' },
   { id: 42, nameRu: 'Фонарик', nameRo: 'Lanternă' },
-  { id: 43, nameRu: 'Бисер', nameRo: 'Margele' },
+  { id: 43, nameRu: 'Бисер', nameRo: 'Mărgele' },
   { id: 44, nameRu: 'Скотч', nameRo: 'Banda adeziva' },
   { id: 45, nameRu: 'Пуговицы', nameRo: 'Nasturi' },
   { id: 46, nameRu: 'Всё для бассейна', nameRo: 'Accesori p-u inot' },
@@ -66,13 +81,13 @@ const items = [
   { id: 56, nameRu: 'Бумага цветная', nameRo: 'Hârtie Colorată' },
   { id: 57, nameRu: 'Бумага Xerox', nameRo: 'Hârtie Xerox' },
   { id: 58, nameRu: 'Бумага для заметок', nameRo: 'Hârtie De Notițe' },
-  { id: 59, nameRu: 'Урна для бумаг', nameRo: 'Cos de hirtie' },
-  { id: 60, nameRu: 'Бэйджик', nameRo: 'Ecusoane' },
-  { id: 61, nameRu: 'Ватман', nameRo: 'Hirtie mare Vatman' },
+  { id: 59, nameRu: 'Урна для бумаг', nameRo: 'Coș de hârtie' },
+  { id: 60, nameRu: 'Бейджики', nameRo: 'Ecusoane' },
+  { id: 61, nameRu: 'Ватман', nameRo: 'Hârtie mare Vatman' },
   { id: 62, nameRu: 'Глобус', nameRo: 'Glob' },
   { id: 63, nameRu: 'Гуашь', nameRo: 'Guașă' },
   { id: 64, nameRu: 'Дневник', nameRo: 'Agenda' },
-  { id: 65, nameRu: 'Дырокол', nameRo: 'Perforare' },
+  { id: 65, nameRu: 'Дырокол', nameRo: 'Perforator' },
   { id: 66, nameRu: 'Доска', nameRo: 'Tabla' },
   { id: 67, nameRu: 'Зажим', nameRo: 'Agrafe de birou' },
   { id: 68, nameRu: 'Кассовая лента', nameRo: 'Role de casa' },
@@ -89,14 +104,14 @@ const items = [
   { id: 79, nameRu: 'Маркер', nameRo: 'Marker' },
   { id: 80, nameRu: 'Мел', nameRo: 'Cretă' },
   { id: 81, nameRu: 'Ножницы', nameRo: 'Foarfece' },
-  { id: 82, nameRu: 'Нож канц.', nameRo: 'Cuțit De Papetărie' },
-  { id: 83, nameRu: 'Открытка', nameRo: 'Carte Poştală' },
+  { id: 82, nameRu: 'Нож канцелярский', nameRo: 'Cuțit De Papetărie' },
+  { id: 83, nameRu: 'Открытки', nameRo: 'Felicitări' },
   { id: 84, nameRu: 'Обложки', nameRo: 'Invelitori' },
-  { id: 85, nameRu: 'Посуда', nameRo: 'Feluri De Mâncare' },
+  { id: 85, nameRu: 'Посуда', nameRo: 'Vesela' },
   { id: 86, nameRu: 'Палитра', nameRo: 'Paletă' },
   { id: 87, nameRu: 'Пластилин', nameRo: 'Plastilină' },
   { id: 88, nameRu: 'Папка', nameRo: 'Mapa' },
-  { id: 89, nameRu: 'Пенал для ручек и карандашей', nameRo: 'Trusa Pentru Pixuri Si Creioane' },
+  { id: 89, nameRu: 'Пенал', nameRo: 'Penar' },
   { id: 90, nameRu: 'Сумка', nameRo: 'Geanta' },
   { id: 91, nameRu: 'Подставка', nameRo: 'Suport' },
   { id: 92, nameRu: 'Печать', nameRo: 'Echipamente p-u stampila' },
@@ -106,26 +121,26 @@ const items = [
   { id: 96, nameRu: 'Кухоная утварь', nameRo: 'Ustensile De Bucătărie' },
   { id: 97, nameRu: 'Ваза', nameRo: 'Vază' },
   { id: 98, nameRu: 'Стержни для ручек', nameRo: 'Mina de stilou' },
-  { id: 99, nameRu: 'Стэплер', nameRo: 'Capsator' },
-  { id: 100, nameRu: 'Скобы для стэплера', nameRo: 'Capse Pentru Un Capsator' },
+  { id: 99, nameRu: 'Степлер', nameRo: 'Capsator' },
+  { id: 100, nameRu: 'Скобы для степлера', nameRo: 'Capse Pentru Capsator' },
   { id: 101, nameRu: 'Счеты', nameRo: 'Abac' },
   { id: 102, nameRu: 'Скрепки', nameRo: 'Clame' },
-  { id: 103, nameRu: 'Стакан для воды', nameRo: 'Pahar Pentru Apa' },
+  { id: 103, nameRu: 'Стакан для воды', nameRo: 'Pahar Pentru Apă' },
   { id: 104, nameRu: 'Регистры', nameRo: 'Registrele' },
   { id: 105, nameRu: 'Точилка', nameRo: 'Ascuţitoare' },
   { id: 106, nameRu: 'Ранцы', nameRo: 'Rucsacuri' },
-  { id: 107, nameRu: 'Тубус для листов', nameRo: 'Tub De Foaie' },
-  { id: 108, nameRu: 'Упаковка подарков', nameRo: 'Ambalaj Cadou' },
+  { id: 107, nameRu: 'Тубус', nameRo: 'Tub' },
+  { id: 108, nameRu: 'Упаковка подарков', nameRo: 'Ambalare Cadou' },
   { id: 109, nameRu: 'Флаг', nameRo: 'Drapela' },
   { id: 110, nameRu: 'Файлы', nameRo: 'Folie' },
   { id: 111, nameRu: 'Фломастеры', nameRo: 'Carioci' },
-  { id: 112, nameRu: 'Фомиран листы', nameRo: 'Fomiran Foi' },
+  { id: 112, nameRu: 'Фоамиран', nameRo: 'Foamiran' },
   { id: 113, nameRu: 'Фоторамка', nameRo: 'Rama p-u diplome' },
   { id: 114, nameRu: 'Ценники', nameRo: 'Etichete' },
   { id: 115, nameRu: 'Циркуль', nameRo: 'Compas' },
   { id: 116, nameRu: 'Лента', nameRo: 'Panglică' },
   { id: 117, nameRu: 'Термометр', nameRo: 'Termometru' },
-  { id: 118, nameRu: 'Замок', nameRo: 'Blocare' },
+  { id: 118, nameRu: 'Замок', nameRo: 'Lacăt' },
   { id: 119, nameRu: 'Весы', nameRo: 'Cântare' },
   { id: 120, nameRu: 'Прищепки', nameRo: 'Agrafe De Rufe' },
   { id: 121, nameRu: 'Насос', nameRo: 'Pompa' },
@@ -137,23 +152,27 @@ const items = [
   { id: 127, nameRu: 'Картины', nameRo: 'Picturi' },
   { id: 128, nameRu: 'Цветы искусственные', nameRo: 'Flori Artificiale' },
   { id: 129, nameRu: 'Фрукты искусственные', nameRo: 'Fructe Artificiale' },
-  { id: 130, nameRu: 'Блэнлер', nameRo: 'Blenler' },
-  { id: 131, nameRu: 'Бритва электрическая', nameRo: 'Brici Electric' },
+  { id: 130, nameRu: 'Блендер', nameRo: 'Blender' },
+  { id: 131, nameRu: 'Бритва электрическая', nameRo: 'Aparat de tuns barba' },
   { id: 132, nameRu: 'Ремень', nameRo: 'Centura' },
   { id: 133, nameRu: 'Чайник', nameRo: 'Fierbător' },
-  { id: 134, nameRu: 'Утюг', nameRo: 'Fier' },
+  { id: 134, nameRu: 'Утюг', nameRo: 'Fier de călcat' },
   { id: 135, nameRu: 'Фен', nameRo: 'Uscător De Păr' },
   { id: 136, nameRu: 'Вентилятор', nameRo: 'Ventilator' },
-  { id: 137, nameRu: 'Зарядка для телефона', nameRo: 'Incarcator Telefon' },
+  { id: 137, nameRu: 'Газ, зажигалки', nameRo: 'Gaz, brichete' },
   { id: 138, nameRu: 'Кабель', nameRo: 'Cablu' },
   { id: 139, nameRu: 'Радио', nameRo: 'Radio' },
   { id: 140, nameRu: 'Ножи', nameRo: 'Cuțite' },
   { id: 141, nameRu: 'Колокольчик', nameRo: 'Clopot' },
   { id: 142, nameRu: 'Магниты', nameRo: 'Magneți' },
-  { id: 143, nameRu: 'Настольный органайзер', nameRo: 'Organizator Desktop' },
+  { id: 143, nameRu: 'Настольный органайзер', nameRo: 'Organizator De Birou' },
   { id: 144, nameRu: 'Ногти искусственные', nameRo: 'Unghii Artificiale' },
-  { id: 145, nameRu: 'Маникюрные аксесуары', nameRo: 'Accesorii Pentru Manichiura' },
-  { id: 146, nameRu: 'Косметика', nameRo: 'Cosmetice' }
+  { id: 145, nameRu: 'Маникюрные аксесуары', nameRo: 'Accesorii Pentru Manichiură' },
+  { id: 146, nameRu: 'Косметика', nameRo: 'Cosmetice' },
+  { id: 147, nameRu: 'Картон', nameRo: 'Carton' },
+  { id: 148, nameRu: 'Календарь', nameRo: 'Calendar' },
+  { id: 149, nameRu: 'Бумага', nameRo: 'Hârtie' },
+  { id: 150, nameRu: 'Рулетка', nameRo: 'Ruletă' }
 ]
 
 const search = ref('')
@@ -186,6 +205,7 @@ const search = ref('')
             :headers="headers"
             :items="items"
             :search="search"
+            filter-mode="some"
           >
             <template #[`item.id`]="{ value }: any">
               <b>{{ value }}</b>
